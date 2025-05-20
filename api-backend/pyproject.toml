@@ -1,0 +1,31 @@
+[project]
+name = "api_backend"
+version = "0.1.0"
+description = "MeusFilmes API Backend"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "flask",
+    "flask-sqlalchemy",
+    "flask-cors",
+    "PyJWT",
+    "requests",
+    "python-dotenv",
+    "flask-swagger-ui",
+    "PyYAML",
+    "pymysql",
+    "gunicorn",
+    "cryptography",
+]
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["api_backend*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

@@ -1,0 +1,106 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: dark; /* Forçar esquema de cores escuro */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Force dark theme on HTML and body elements */
+html, 
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 100vh !important;
+  background-color: #121212 !important; /* Cor de fundo escura, mas não preto absoluto */
+  color: #f0f0f0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow-x: hidden !important; /* Prevenir rolagem horizontal em mobile */
+}
+
+/* Ensure dark backgrounds cascade through the entire page */
+#app {
+  background-color: #121212 !important;
+  min-height: 100vh !important;
+  color: #f0f0f0 !important;
+  overflow-x: hidden !important; /* Prevenir rolagem horizontal em mobile */
+}
+
+/* Ajustes para elementos comuns do Bootstrap no tema escuro */
+.card {
+  background-color: #1e1e1e !important; /* Cartões ligeiramente mais claros que o fundo */
+  border-color: #333 !important;
+}
+
+.modal-content {
+  background-color: #1e1e1e !important;
+  border-color: #333 !important;
+}
+
+.list-group-item {
+  background-color: #1e1e1e !important;
+  border-color: #333 !important;
+}
+
+.form-control, .form-select {
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+  color: #f0f0f0 !important;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: #2a2a2a !important;
+  border-color: #a259ff !important;
+  box-shadow: 0 0 0 0.25rem rgba(162, 89, 255, 0.25) !important;
+}
+
+/* Customizar scrollbar para tema escuro */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a259ff;
+}
+
+/* Otimizações mobile */
+.container-fluid {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+@media (max-width: 576px) {
+  .row {
+    margin-left: -0.5rem !important;
+    margin-right: -0.5rem !important;
+  }
+  
+  .row > * {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  h1, .h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  h2, .h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3, .h3 {
+    font-size: 1.25rem !important;
+  }
+}
