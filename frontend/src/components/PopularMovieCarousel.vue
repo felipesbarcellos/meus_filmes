@@ -78,6 +78,9 @@ const visibleCount = computed(() => {
   if (windowWidth.value < 576) return 2      // Dispositivos muito pequenos
   if (windowWidth.value < 768) return 3      // Celulares
   if (windowWidth.value < 992) return 4      // Tablets
+  if (windowWidth.value < 1200) return 5   // Tablets grandes
+  if (windowWidth.value < 1400) return 6   // Laptops pequenos
+  if (windowWidth.value < 1600) return 7   // Laptops grandes
   return 5                                  // Desktop
 })
 
