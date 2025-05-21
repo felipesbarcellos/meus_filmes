@@ -1,6 +1,6 @@
 <template>
   <div class="container py-4">
-    <form @submit.prevent="handleSearch" class="row mb-4 p-4 bg-dark rounded shadow">
+    <form @submit.prevent="triggerSearchNow" class="row mb-4 p-4 bg-dark rounded shadow">
       <div class="col-md-10 mb-2 mb-md-0">
         <input type="text" v-model="query" placeholder="Buscar por filmes..." class="form-control form-control-lg bg-dark text-light border-secondary" />
       </div>
@@ -22,8 +22,8 @@
       {{ error }}
     </div>
 
-    <div v-if="!loading && searched && results.length === 0 && !error" class="text-center py-5 text-secondary">
-      Nenhum filme encontrado para "{{ query }}". Tente um termo diferente.
+    <div v-if="!loading && searched && results.length === 0 && !error && queryWhenSearched" class="text-center py-5 text-secondary">
+      Nenhum filme encontrado para "{{ queryWhenSearched }}". Tente um termo diferente.
     </div>
 
     <div v-if="results.length > 0 && !loading" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
@@ -48,46 +48,71 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue' // Importar watch
 import { useRouter } from 'vue-router'
 import { apiGet } from '@/utils/api'
 
-const API_BASE_URL = '/api/tmdb' // URL base do seu backend para TMDB
+const API_BASE_URL = '/api/tmdb'
 
 const query = ref('')
 const results = ref([])
 const loading = ref(false)
 const error = ref(false)
-const searched = ref(false) // Para saber se uma busca já foi feita
+const searched = ref(false)
+const queryWhenSearched = ref('') // Para guardar o termo buscado para a mensagem "Nenhum filme encontrado"
 const router = useRouter()
 
-async function handleSearch() {
-  if (!query.value.trim()) {
+let debounceTimer = null
+
+// Função de busca principal
+async function performSearch(searchTerm) {
+  if (!searchTerm.trim()) {
     results.value = []
-    searched.value = true // Considera como "buscado" para mostrar mensagem de "nada encontrado"
+    searched.value = true
+    queryWhenSearched.value = searchTerm // Atualiza mesmo se vazio para limpar a mensagem anterior
     error.value = false
     return
   }
   loading.value = true
   error.value = false
-  searched.value = false
-  results.value = []
+  // Não limpar results.value aqui para uma UX mais suave enquanto digita
+  // results.value = [] 
   try {
-    // Usa apiGet para centralizar tratamento de erro, se desejar
-    const data = await apiGet(`${API_BASE_URL}/search?query=${encodeURIComponent(query.value)}`)
+    const data = await apiGet(`${API_BASE_URL}/search?query=${encodeURIComponent(searchTerm)}`)
     results.value = data.results || []
     searched.value = true
+    queryWhenSearched.value = searchTerm // Guarda o termo que foi efetivamente buscado
   } catch (e) {
     error.value = e.message || "Erro ao buscar filmes."
     console.error("Erro ao buscar filmes:", e)
-    results.value = [] // Limpa resultados em caso de erro
+    results.value = []
   } finally {
     loading.value = false
   }
 }
 
+// Observa a variável query
+watch(query, (newQuery) => {
+  clearTimeout(debounceTimer)
+  if (newQuery.trim() === '') {
+    results.value = [] // Limpa resultados imediatamente se o campo estiver vazio
+    searched.value = false // Reseta o estado de "buscado"
+    queryWhenSearched.value = ''
+    return
+  }
+  debounceTimer = setTimeout(() => {
+    performSearch(newQuery)
+  }, 500) // Espera 500ms após o usuário parar de digitar
+})
+
+// Função para o botão de busca (caso o usuário clique antes do debounce)
+function triggerSearchNow() {
+  clearTimeout(debounceTimer) // Cancela qualquer busca pendente do debounce
+  performSearch(query.value)
+}
+
 function getPosterUrl(path) {
-  return path ? `https://image.tmdb.org/t/p/w300${path}` : '' // Fallback para string vazia
+  return path ? `https://image.tmdb.org/t/p/w300${path}` : ''
 }
 
 function goToMovie(id) {
