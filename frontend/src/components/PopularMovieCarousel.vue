@@ -81,7 +81,8 @@ const visibleCount = computed(() => {
   if (windowWidth.value < 1200) return 5   // Tablets grandes
   if (windowWidth.value < 1400) return 6   // Laptops pequenos
   if (windowWidth.value < 1600) return 7   // Laptops grandes
-  return 5                                  // Desktop
+  if (windowWidth.value < 1800) return 8   // Laptops muito grandes
+  if (windowWidth.value < 2000) return 9   // Monitores pequenos
 })
 
 // Detectar mudanças na largura da tela
