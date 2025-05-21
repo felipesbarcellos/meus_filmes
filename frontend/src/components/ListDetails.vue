@@ -28,7 +28,7 @@
               <i class="bi bi-share"></i> Compartilhar lista
             </button>
           </div>
-          <MovieList v-if="moviesData.length > 0" :movies="moviesData" :showRemoveFromList="true" />
+          <MovieList v-if="moviesData.length > 0" :movies="moviesData" :showRemoveFromList="true" @remove-from-list="handleRemoveFromList" />
         </div>
       </div>
     </div>
@@ -40,7 +40,7 @@ import { ref, onMounted, watch } from 'vue' // Adicionado watch
 import { useRoute } from 'vue-router'
 import MovieList from './MovieList.vue'
 import { useAuthStore } from '@/stores/auth' // Importar o store Pinia
-import { apiGet } from '@/utils/api'
+import { apiGet, apiDelete } from '@/utils/api' // Adicionado apiDelete
 
 const route = useRoute()
 const authStore = useAuthStore() // Usar o store Pinia
@@ -130,6 +130,16 @@ watch(() => authStore.isAuthenticated, (newIsAuthenticated) => {
     fetchListDetails()
   }
 }, { immediate: true }) // `immediate: true` para rodar na montagem inicial
+
+async function handleRemoveFromList(tmdbId) {
+  if (!authStore.isAuthenticated || !list.value.id) return;
+  try {
+    await apiDelete(`${BACKEND_API_URL}/lists/${list.value.id}/movies/${tmdbId}`);
+    await fetchListDetails(); // Atualiza a lista após remoção
+  } catch (e) {
+    error.value = e.message || 'Erro ao remover filme da lista.';
+  }
+}
 
 function shareListLink() {
   const publicUrl = `${window.location.origin}/listas/publica/${list.value.id}`;
