@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue' // Adicionado watch
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth' // Importar o store Pinia
 import { apiGet, apiPost, apiPut, apiDelete } from '@/utils/api'
 
@@ -10,6 +11,8 @@ const error = ref('')
 
 const router = useRouter()
 const authStore = useAuthStore() // Usar o store Pinia
+
+const { t } = useI18n()
 
 const BACKEND_API_URL = '/api'
 
@@ -35,10 +38,10 @@ async function fetchLists() {
 
 async function createList() {
   if (!authStore.isAuthenticated || !authStore.user?.id) {
-    alert('Você precisa estar logado para criar listas.')
+    alert(t('movieLists.errors.authRequired'))
     return
   }
-  const name = prompt('Digite o nome da nova lista:')
+  const name = prompt(t('movieLists.prompts.newListName'))
   if (!name || !name.trim()) return
 
   loading.value = true
@@ -54,10 +57,10 @@ async function createList() {
 
 async function deleteList(listId) {
   if (!authStore.isAuthenticated) {
-    alert('Você precisa estar logado para excluir listas.')
+    alert(t('movieLists.errors.authRequired'))
     return
   }
-  if (!confirm('Tem certeza que deseja excluir esta lista? Essa ação não pode ser desfeita.')) return
+  if (!confirm(t('movieLists.prompts.confirmDelete'))) return
 
   loading.value = true
   try {
@@ -72,10 +75,10 @@ async function deleteList(listId) {
 
 async function editListName(list) {
   if (!authStore.isAuthenticated) {
-    alert('Você precisa estar logado para editar listas.')
+    alert(t('movieLists.errors.authRequired'))
     return
   }
-  const newName = prompt('Novo nome da lista:', list.name)
+  const newName = prompt(t('movieLists.prompts.editListName'), list.name)
   if (!newName || !newName.trim() || newName === list.name) return
 
   loading.value = true
@@ -115,17 +118,17 @@ watch(() => authStore.isAuthenticated, (newIsAuthenticated) => {
   <div class="card bg-dark text-light shadow-lg mx-auto mt-4 mb-5" style="max-width: 650px;">
     <div class="card-body p-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3 mb-0">Minhas Listas</h2>
+        <h2 class="h3 mb-0">{{ $t('movieLists.title') }}</h2>
         <button class="btn btn-primary" @click="createList">
-          <i class="bi bi-plus-circle me-1"></i> Nova lista
+          <i class="bi bi-plus-circle me-1"></i> {{ $t('movieLists.newListButton') }}
         </button>
       </div>
       
       <div v-if="loading" class="text-center py-4">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Carregando...</span>
+          <span class="visually-hidden">{{ $t('movieLists.loading.srOnly') }}</span>
         </div>
-        <p class="mt-2 text-secondary">Carregando listas...</p>
+        <p class="mt-2 text-secondary">{{ $t('movieLists.loading.text') }}</p>
       </div>
       
       <div v-else-if="error" class="alert alert-danger" role="alert">
@@ -133,7 +136,7 @@ watch(() => authStore.isAuthenticated, (newIsAuthenticated) => {
       </div>
       
       <div v-else-if="lists.length === 0" class="alert alert-secondary text-center py-3">
-        Você ainda não criou nenhuma lista.
+        {{ $t('movieLists.noLists') }}
       </div>
       
       <ul v-else class="list-group list-group-flush">
@@ -143,17 +146,17 @@ watch(() => authStore.isAuthenticated, (newIsAuthenticated) => {
             @click="goToList(list)">
           <div class="d-flex align-items-center">
             {{ list.name }}
-            <span v-if="list.is_main" class="badge bg-primary ms-2">Padrão</span>
+            <span v-if="list.is_main" class="badge bg-primary ms-2">{{ $t('movieLists.defaultBadge') }}</span>
           </div>
           
           <div class="btn-group">
             <button class="btn btn-sm btn-outline-primary" 
-                    title="Editar nome" 
+                    :title="$t('movieLists.actions.editTitle')" 
                     @click.stop="editListName(list)">
               ✏️
             </button>
             <button class="btn btn-sm btn-outline-danger" 
-                    title="Excluir lista" 
+                    :title="$t('movieLists.actions.deleteTitle')" 
                     @click.stop="deleteList(list.id)">
               🗑️
             </button>

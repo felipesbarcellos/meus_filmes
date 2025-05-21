@@ -5,16 +5,16 @@
       :disabled="currentPage === 1 || loading"
       @click="changePage(currentPage - 1)"
     >
-      <span class="d-none d-sm-inline">Anterior</span>
+      <span class="d-none d-sm-inline">{{ $t('pagination.previous') }}</span>
       <span class="d-inline d-sm-none">&laquo;</span>
     </button>
-    <span class="text-primary fw-bold mx-1">Página {{ currentPage }}</span>
+    <span class="text-primary fw-bold mx-1">{{ $t('pagination.page') }} {{ currentPage }}</span>
     <button
       class="btn btn-primary btn-sm ms-2 ms-md-3"
       :disabled="!hasMorePages || loading"
       @click="changePage(currentPage + 1)"
     >
-      <span class="d-none d-sm-inline">Próxima</span>
+      <span class="d-none d-sm-inline">{{ $t('pagination.next') }}</span>
       <span class="d-inline d-sm-none">&raquo;</span>
     </button>
   </div>
@@ -22,6 +22,9 @@
 
 <script setup>
 import { defineProps, defineEmits, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
   currentPage: {

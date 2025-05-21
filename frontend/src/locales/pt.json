@@ -1,0 +1,195 @@
+{
+  "search": {
+    "placeholder": "Buscar por filmes...",
+    "button": "Buscar",
+    "loadingSuggestions": "Carregando sugestões...",
+    "noSuggestions": "Nenhuma sugestão encontrada.",
+    "loadingResults": "Carregando resultados finais...",
+    "noResults": "Nenhum filme encontrado para \"{query}\". Tente um termo diferente.",
+    "releaseYear": "Lançamento"
+  },
+  "movieCard": {
+    "noImage": "Sem Imagem",
+    "release": "Lançamento"
+  },
+  "general": {
+    "loading": "Carregando..."
+  },
+  "genreMovies": {
+    "title": "Filmes do Gênero: ",
+    "backButton": "Voltar",
+    "loadingError": "Erro ao carregar filmes. Por favor, tente novamente mais tarde.",
+    "noMoviesFound": "Nenhum filme encontrado para este gênero."
+  },
+  "login": {
+    "title": "Login",
+    "emailLabel": "Email",
+    "passwordLabel": "Senha",
+    "loginButton": "Entrar",
+    "loggingInButton": "Entrando...",
+    "noAccount": "Não tem uma conta?",
+    "createAccountButton": "Crie uma aqui",
+    "loginFailed": "Falha no login"
+  },
+  "popularMovies": {
+    "title": "Filmes Populares",
+    "loadingMessage": "Carregando filmes populares...",
+    "noMoviesFound": "Nenhum filme popular encontrado no momento.",
+    "invalidResponse": "Resposta da API inválida ao buscar filmes populares.",
+    "loadFailure": "Falha ao carregar filmes populares. Tente novamente mais tarde."
+  },
+  "publicList": {
+    "loadingMessage": "Carregando lista pública...",
+    "mainListBadge": "Principal",
+    "listIdPrefix": "ID: ",
+    "noMoviesInList": "Nenhum filme nesta lista ainda.",
+    "fetchError": "Erro ao buscar lista pública."
+  },
+  "genreCarousel": {
+    "title": "Explorar por Gênero",
+    "loading": {
+      "srOnly": "Carregando gêneros...",
+      "text": "Carregando gêneros..."
+    },
+    "error": {
+      "apiResponse": "Resposta inválida da API ao buscar gêneros.",
+      "fetch": "Falha ao carregar gêneros. Por favor, tente novamente mais tarde."
+    }
+  },
+  "movieList": {
+    "watchedOn": "Assistido em:",
+    "na": "N/A",
+    "actions": {
+      "edit": "Editar",
+      "delete": "Deletar",
+      "updateDateTitle": "Alterar data",
+      "removeFromWatchedTitle": "Remover dos assistidos",
+      "confirmDate": "Confirmar Data"
+    },
+    "warnings": {
+      "noDateSelected": "Nenhuma data selecionada para atualização."
+    }
+  },
+  "listDetails": {
+    "loading": {
+      "srOnly": "Carregando...",
+      "text": "Carregando detalhes da lista..."
+    },
+    "mainBadge": "Principal",
+    "idLabel": "ID:",
+    "noMovies": "Nenhum filme nesta lista ainda.",
+    "shareListButton": "Compartilhar lista",
+    "error": {
+      "authRequired": "Você precisa estar logado para ver os detalhes da lista.",
+      "invalidTmdbIdConsole": "Não foi possível extrair um ID TMDB primitivo válido do item:",
+      "fetchTmdbMovieConsole": "Erro ao buscar filme TMDB ID {id} para lista: {message}.",
+      "fetchListDetails": "Erro ao buscar detalhes da lista.",
+      "removeMovie": "Erro ao remover filme da lista."
+    },
+    "share": {
+      "success": "Link da lista copiado para a área de transferência!",
+      "prompt": "Copie o link da lista:"
+    }
+  },
+  "movieLists": {
+    "title": "Minhas Listas",
+    "newListButton": "Nova lista",
+    "loading": {
+      "srOnly": "Carregando...",
+      "text": "Carregando listas..."
+    },
+    "noLists": "Você ainda não criou nenhuma lista.",
+    "defaultBadge": "Padrão",
+    "actions": {
+      "editTitle": "Editar nome",
+      "deleteTitle": "Excluir lista"
+    },
+    "errors": {
+      "authRequired": "Você precisa estar logado para realizar esta ação."
+    },
+    "prompts": {
+      "newListName": "Digite o nome da nova lista:",
+      "editListName": "Novo nome da lista:",
+      "confirmDelete": "Tem certeza que deseja excluir esta lista? Essa ação não pode ser desfeita."
+    }
+  },
+  "movieDetails": {
+    "director": "Diretor",
+    "synopsis": "Sinopse",
+    "noSynopsis": "Sinopse não disponível.",
+    "addToList": "Adicionar à Lista",
+    "markAsWatched": "Marcar como Assistido",
+    "loading": {
+      "srOnly": "Carregando...",
+      "text": "Carregando detalhes do filme..."
+    },
+    "addToListModalTitle": "Adicionar '{title}' à lista:",
+    "confirmAddToList": "Confirmar",
+    "noUserLists": "Você não possui listas. Crie uma primeiro!",
+    "close": "Fechar",
+    "trailer": "Trailer",
+    "hourAbbr": "h",
+    "minAbbr": "min"
+  },
+  "pagination": {
+    "previous": "Anterior",
+    "next": "Próxima",
+    "page": "Página"
+  },
+  "popularMovieCarousel": {
+    "title": "Filmes Populares",
+    "loading": {
+      "srOnly": "Carregando...",
+      "text": "Carregando"
+    },
+    "error": {
+      "load": "Erro ao carregar filmes."
+    },
+    "seeMore": "Ver mais filmes populares"
+  },
+  "watchedCount": {
+    "label": "{count} filme assistido | {count} filmes assistidos"
+  },
+  "watchedList": {
+    "title": "Filmes Assistidos",
+    "startDate": "Data início:",
+    "endDate": "Data fim:",
+    "clearFilters": "Limpar filtros",
+    "loading": {
+      "srOnly": "Carregando...",
+      "text": "Carregando filmes assistidos..."
+    },
+    "noMovies": "Você ainda não marcou nenhum filme como assistido."
+  },
+  "watchedStats": {
+    "genres": "{count} gêneros nos seus filmes assistidos"
+  },
+  "register": {
+    "title": "Criar Conta",
+    "nameLabel": "Nome",
+    "emailLabel": "Email",
+    "passwordLabel": "Senha",
+    "confirmPasswordLabel": "Confirmar Senha",
+    "registerButton": "Registrar",
+    "registeringButton": "Registrando...",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "loginHereButton": "Faça login aqui",
+    "passwordsDontMatch": "As senhas não coincidem.",
+    "registerFailed": "Falha no registro.",
+    "successRedirect": "Registro bem-sucedido! Redirecionando..."
+  },
+  "nav": {
+    "home": "Início",
+    "search": "Buscar",
+    "myLists": "Minhas Listas",
+    "watched": "Assistidos",
+    "login": "Login",
+    "register": "Registrar",
+    "logout": "Sair"
+  },
+  "footer": {
+    "rights": "Todos os direitos reservados.",
+    "madeWith": "Feito com",
+    "andVue": "e Vue.js"
+  }
+}

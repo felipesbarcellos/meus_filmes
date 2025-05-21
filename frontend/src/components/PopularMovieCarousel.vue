@@ -1,15 +1,15 @@
 <template>
   <div class="container-fluid bg-dark rounded shadow-lg py-3 py-md-4 px-2 px-md-4 my-3 my-md-4">
-    <h2 class="h4 h3-md mb-3 mb-md-4 text-light">Filmes Populares</h2>
+    <h2 class="h4 h3-md mb-3 mb-md-4 text-light">{{ $t('popularMovieCarousel.title') }}</h2>
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
+        <span class="visually-hidden">{{ $t('popularMovieCarousel.loading.srOnly') }}</span>
       </div>
-      <p class="mt-2 text-secondary">Carregando</p>
+      <p class="mt-2 text-secondary">{{ $t('popularMovieCarousel.loading.text') }}</p>
     </div>
     
     <div v-else-if="error" class="alert alert-danger text-center" role="alert">
-      Erro ao carregar filmes.
+      {{ $t('popularMovieCarousel.error.load') }}
     </div>
     <div v-else>
       <div class="d-flex align-items-center">
@@ -29,7 +29,7 @@
                    :alt="movie.title" 
                    class="card-img-top movie-poster" />
                    <div class="position-absolute top-0 end-0 m-2 badge bg-dark movie-rating">
-                <span>{{ movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A' }}</span>
+                <span>{{ movie.vote_average ? movie.vote_average.toFixed(1) : $t('movieList.na') }}</span>
                 <span class="text-warning ms-1">★</span>
               </div>
               
@@ -52,7 +52,7 @@
       </div>
       <div class="text-center mt-3">
         <RouterLink to="/popular-movies" class="btn btn-outline-light btn-sm">
-          Ver mais filmes populares
+          {{ $t('popularMovieCarousel.seeMore') }}
         </RouterLink>
       </div>
     </div>
@@ -61,8 +61,11 @@
 
 <script setup>
 import { ref, onMounted, computed, onUnmounted } from 'vue'
-import { useRouter, RouterLink } from 'vue-router' // Added RouterLink
+import { useRouter, RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { apiGet } from '@/utils/api'
+
+const { t } = useI18n()
 
 const API_BASE_URL = '/api/tmdb' // URL base do seu backend para TMDB
 

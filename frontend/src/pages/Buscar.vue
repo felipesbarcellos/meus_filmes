@@ -5,7 +5,7 @@
         <input 
           type="text" 
           v-model="query" 
-          placeholder="Buscar por filmes..." 
+          :placeholder="$t('search.placeholder')" 
           class="form-control form-control-lg bg-dark text-light border-secondary"
           @blur="handleInputBlur"
           @focus="handleInputFocus"
@@ -32,7 +32,7 @@
             @keydown.space="selectSuggestion(suggestion)"
           >
             {{ suggestion.title }}
-            <small v-if="suggestion.release_date && suggestion.release_date.length >= 4" class="text-muted ms-2">({{ suggestion.release_date.substring(0,4) }})</small>
+            <small v-if="suggestion.release_date && suggestion.release_date.length >= 4" class="text-muted ms-2">({{ $t('search.releaseYear') }} {{ suggestion.release_date.substring(0,4) }})</small>
           </li>
         </ul>
         <!-- Loading Suggestions Indicator -->
@@ -41,7 +41,7 @@
           class="list-group-item bg-dark text-light border-secondary text-center p-2 position-absolute w-100 mt-1"
           style="z-index: 1000;"
         >
-          Carregando sugestões...
+          {{ $t('search.loadingSuggestions') }}
         </div>
         <!-- No Suggestions Found Indicator -->
         <div 
@@ -49,12 +49,12 @@
           class="list-group-item bg-dark text-light border-secondary text-center p-2 position-absolute w-100 mt-1"
           style="z-index: 1000;"
         >
-          Nenhuma sugestão encontrada.
+          {{ $t('search.noSuggestions') }}
         </div>
       </div>
       <div class="col-md-2">
         <button type="submit" class="btn btn-primary w-100 py-2" :disabled="loadingFinalResults || (loadingSuggestions && query.trim())">
-          {{ loadingFinalResults ? 'Buscando...' : ((loadingSuggestions && query.trim()) ? 'Aguarde...' : 'Buscar') }}
+          {{ loadingFinalResults ? $t('search.button') : ((loadingSuggestions && query.trim()) ? $t('general.loading') : $t('search.button')) }}
         </button>
       </div>
     </form>
@@ -62,19 +62,19 @@
     <!-- Main Loading Indicator for Final Results -->
     <div v-if="loadingFinalResults" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
+        <span class="visually-hidden">{{ $t('general.loading') }}</span>
       </div>
-      <p class="mt-3 text-secondary">Carregando resultados finais...</p>
+      <p class="mt-3 text-secondary">{{ $t('search.loadingResults') }}</p>
     </div>
     
     <!-- Error Display -->
     <div v-if="error && !loadingFinalResults" class="alert alert-danger" role="alert">
-      {{ error }}
+      {{ error }} <!-- Error messages from API might not need translation here, or could be generic keys -->
     </div>
 
     <!-- No Final Results Found -->
     <div v-if="!loadingFinalResults && searched && finalResults.length === 0 && !error && queryWhenSearched" class="text-center py-5 text-secondary">
-      Nenhum filme encontrado para "{{ queryWhenSearched }}". Tente um termo diferente.
+      {{ $t('search.noResults', { query: queryWhenSearched }) }}
     </div>
 
     <!-- Final Results Display -->
@@ -84,13 +84,13 @@
           <div class="poster-container bg-dark">
             <img :src="getPosterUrl(movie.poster_path)" :alt="movie.title" class="card-img-top movie-poster" v-if="movie.poster_path" />
             <div v-else class="d-flex justify-content-center align-items-center h-100 text-secondary">
-              Sem Imagem
+              {{ $t('movieCard.noImage') }}
             </div>
           </div>
           <div class="card-body">
             <h5 class="card-title">{{ movie.title }}</h5>
             <p class="card-text small text-secondary" v-if="movie.release_date && movie.release_date.length >=4">
-              Lançamento: {{ movie.release_date.substring(0, 4) }}
+              {{ $t('movieCard.release') }}: {{ movie.release_date.substring(0, 4) }}
             </p>
           </div>
         </div>
@@ -100,9 +100,12 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'; // Importar watch and nextTick
+import { ref, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n'; // Import useI18n
 import { apiGet } from '@/utils/api';
+
+const { t } = useI18n(); // Initialize t function for script block usage if needed (not strictly for template)
 
 const API_BASE_URL = '/api/tmdb';
 
@@ -166,7 +169,8 @@ async function fetchFinalResults(searchTerm) {
     searched.value = true;
     queryWhenSearched.value = searchTerm;
   } catch (e) {
-    error.value = e.message || "Erro ao buscar filmes.";
+    // Consider using a generic error key if API error messages are not localized
+    error.value = e.message || t('search.fetchError'); // Example: t('search.fetchError')
     console.error("Erro ao buscar filmes:", e);
     finalResults.value = [];
   } finally {

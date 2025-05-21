@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia' // Importar createPinia
+import { createI18n } from 'vue-i18n'; // Import createI18n
 import App from './App.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from './pages/Home.vue'
@@ -17,6 +18,10 @@ import { setupApi } from './utils/api' // Importar configuração de API
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap' // Imports Bootstrap's JavaScript (which includes Popper.js if bundled)
 import './style.css' // Import custom styles AFTER Bootstrap so they override Bootstrap defaults
+
+// Import translation messages
+import enMessages from './locales/en.json';
+import ptMessages from './locales/pt.json';
 
 const routes = [
   { path: '/', component: Home },
@@ -82,10 +87,22 @@ router.beforeEach((to, from, next) => {
   }
 })
 
+// Configure i18n
+const i18n = createI18n({
+  legacy: false, // Use Composition API mode
+  locale: navigator.language.split('-')[0] || 'pt', // Default locale
+  fallbackLocale: 'en', // Fallback locale
+  messages: {
+    en: enMessages,
+    pt: ptMessages,
+  },
+});
+
 const app = createApp(App)
 
 app.use(createPinia()) // Usar Pinia - Certifique-se que isso acontece antes de router.beforeEach ser efetivamente usado na navegação inicial.
 app.use(router)
+app.use(i18n); // Use i18n
 
 // Configurar utilitário de API com o router
 setupApi(router)

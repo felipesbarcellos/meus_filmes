@@ -2,21 +2,21 @@
   <div class="container py-4">
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
+        <span class="visually-hidden">{{ $t('general.loading') }}</span>
       </div>
-      <p class="mt-3 text-secondary">Carregando lista pública...</p>
+      <p class="mt-3 text-secondary">{{ $t('publicList.loadingMessage') }}</p>
     </div>
     <div v-else-if="error" class="alert alert-danger text-center" role="alert">
-      {{ error }}
+      {{ error }} <!-- API error messages might need specific handling or generic keys -->
     </div>
     <div v-else>
       <h2 class="mb-3">{{ list.name }}</h2>
       <div class="d-flex align-items-center gap-3 mb-4">
-        <span v-if="list.is_main" class="badge bg-primary">Principal</span>
-        <span class="text-secondary small">ID: {{ list.id }}</span>
+        <span v-if="list.is_main" class="badge bg-primary">{{ $t('publicList.mainListBadge') }}</span>
+        <span class="text-secondary small">{{ $t('publicList.listIdPrefix') }}{{ list.id }}</span>
       </div>
       <div v-if="moviesData.length === 0" class="alert alert-secondary text-center">
-        Nenhum filme nesta lista ainda.
+        {{ $t('publicList.noMoviesInList') }}
       </div>
       <MovieList v-else :movies="moviesData" />
     </div>
@@ -28,6 +28,9 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import MovieList from '@/components/MovieList.vue'
 import { apiGet } from '@/utils/api'
+import { useI18n } from 'vue-i18n' // Import useI18n
+
+const { t } = useI18n() // Initialize t function
 
 const route = useRoute()
 const list = ref({ id: null, name: '', is_main: false, user_id: null, movies: [] })
@@ -51,6 +54,8 @@ async function fetchPublicListDetails() {
           const movieDetails = await apiGet(`${API_BASE_URL}/movie/${idForApiCall}`)
           return movieDetails
         } catch (e) {
+          // Log individual movie fetch error, but don't necessarily fail the whole page
+          console.error(`Error fetching details for movie ${idForApiCall}:`, e)
           return null
         }
       })
@@ -59,7 +64,7 @@ async function fetchPublicListDetails() {
       moviesData.value = []
     }
   } catch (e) {
-    error.value = e.message || 'Erro ao buscar lista pública.'
+    error.value = e.message || t('publicList.fetchError')
     list.value = { id: null, name: '', is_main: false, user_id: null, movies: [] }
     moviesData.value = []
   } finally {

@@ -1,52 +1,50 @@
 <template>
   <div class="container bg-dark rounded shadow-lg py-4 px-4 my-4">
-    <h2 class="h3 mb-3 text-light">Filmes Assistidos</h2>
+    <h2 class="h3 mb-3 text-light">{{ $t('watchedList.title') }}</h2>
     <WatchedStats :count="filteredMovies.length" />
-    
     <div class="card bg-dark border-secondary mb-4 p-3">
       <div class="row g-3 align-items-end">
         <div class="col-md-4">
-          <label class="form-label text-light">Data início:</label>
+          <label class="form-label text-light">{{ $t('watchedList.startDate') }}</label>
           <input type="date" v-model="filterStartDate" class="form-control bg-dark text-light border-secondary" />
         </div>
         <div class="col-md-4">
-          <label class="form-label text-light">Data fim:</label>
+          <label class="form-label text-light">{{ $t('watchedList.endDate') }}</label>
           <input type="date" v-model="filterEndDate" class="form-control bg-dark text-light border-secondary" />
         </div>
         <div class="col-md-4">
           <button @click="filterStartDate = ''; filterEndDate = ''; filterMonth = ''" 
                   class="btn btn-primary w-100">
-            Limpar filtros
+            {{ $t('watchedList.clearFilters') }}
           </button>
         </div>
       </div>
     </div>
-    
     <div v-if="loading" class="text-center py-4">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
+        <span class="visually-hidden">{{ $t('watchedList.loading.srOnly') }}</span>
       </div>
-      <p class="mt-2 text-primary">Carregando filmes assistidos...</p>
+      <p class="mt-2 text-primary">{{ $t('watchedList.loading.text') }}</p>
     </div>
-    
     <div v-else-if="error" class="alert alert-danger" role="alert">
       {{ error }}
     </div>
-    
     <div v-else-if="filteredMovies.length === 0" class="alert alert-secondary text-center">
-      Você ainda não marcou nenhum filme como assistido.
+      {{ $t('watchedList.noMovies') }}
     </div>
-    
     <MovieList v-else :movies="filteredMovies" :show-watched-actions="true" @delete-watched="handleDeleteWatched" @update-watched-date="handleUpdateWatchedDate" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import MovieList from './MovieList.vue'
 import WatchedStats from './WatchedStats.vue'
-import { useAuthStore } from '@/stores/auth' // Importar o store Pinia
-import { apiGet, apiPost, apiDelete } from '@/utils/api' // Added apiPost and apiDelete
+import { useAuthStore } from '@/stores/auth'
+import { apiGet, apiPost, apiDelete } from '@/utils/api'
+
+const { t } = useI18n()
 
 const loading = ref(true)
 const error = ref('')

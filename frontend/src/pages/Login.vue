@@ -4,27 +4,27 @@
       <div class="col-sm-10 col-md-8 col-lg-5">
         <div class="card bg-dark text-light shadow-lg">
           <div class="card-body p-4 p-md-5">
-            <h2 class="card-title text-center mb-4">Login</h2>
+            <h2 class="card-title text-center mb-4">{{ $t('login.title') }}</h2>
             <form @submit.prevent="handleLogin">
               <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
+                <label for="email" class="form-label">{{ $t('login.emailLabel') }}</label>
                 <input type="email" id="email" class="form-control form-control-lg bg-secondary text-light border-secondary" v-model="email" required />
               </div>
               <div class="mb-3">
-                <label for="password" class="form-label">Senha</label>
+                <label for="password" class="form-label">{{ $t('login.passwordLabel') }}</label>
                 <input type="password" id="password" class="form-control form-control-lg bg-secondary text-light border-secondary" v-model="password" required />
               </div>
               <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-lg" :disabled="isLoading">
-                  {{ isLoading ? 'Entrando...' : 'Entrar' }}
+                  {{ isLoading ? $t('login.loggingInButton') : $t('login.loginButton') }}
                 </button>
               </div>
               <p v-if="error" class="text-danger mt-3 text-center">{{ error }}</p>
             </form>
             <hr class="my-4 border-secondary">
             <div class="text-center">
-              <p class="mb-2">Não tem uma conta?</p>
-              <button @click="goToRegister" class="btn btn-outline-light">Crie uma aqui</button>
+              <p class="mb-2">{{ $t('login.noAccount') }}</p>
+              <button @click="goToRegister" class="btn btn-outline-light">{{ $t('login.createAccountButton') }}</button>
             </div>
           </div>
         </div>
@@ -38,6 +38,9 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { apiPost } from '@/utils/api'
+import { useI18n } from 'vue-i18n' // Import useI18n
+
+const { t } = useI18n() // Initialize t function
 
 const email = ref('')
 const password = ref('')
@@ -56,7 +59,8 @@ async function handleLogin() {
       password: password.value,
     })
     if (!data || data.error || data.msg) {
-      throw new Error(data.msg || data.error || 'Falha no login')
+      // Use a generic translated error message for login failure
+      throw new Error(data.msg || data.error || t('login.loginFailed'))
     }
     authStore.login(data) // Usa a action do store Pinia
     router.push('/')

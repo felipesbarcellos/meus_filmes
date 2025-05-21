@@ -1,0 +1,195 @@
+{
+  "search": {
+    "placeholder": "Search for movies...",
+    "button": "Search",
+    "loadingSuggestions": "Loading suggestions...",
+    "noSuggestions": "No suggestions found.",
+    "loadingResults": "Loading final results...",
+    "noResults": "No movies found for \"{query}\". Try a different term.",
+    "releaseYear": "Release"
+  },
+  "movieCard": {
+    "noImage": "No Image",
+    "release": "Release"
+  },
+  "general": {
+    "loading": "Loading..."
+  },
+  "genreMovies": {
+    "title": "Movies in Genre: ",
+    "backButton": "Back",
+    "loadingError": "Error loading movies. Please try again later.",
+    "noMoviesFound": "No movies found for this genre."
+  },
+  "login": {
+    "title": "Login",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "loginButton": "Login",
+    "loggingInButton": "Logging in...",
+    "noAccount": "Don't have an account?",
+    "createAccountButton": "Create one here",
+    "loginFailed": "Login failed"
+  },
+  "popularMovies": {
+    "title": "Popular Movies",
+    "loadingMessage": "Loading popular movies...",
+    "noMoviesFound": "No popular movies found at the moment.",
+    "invalidResponse": "Invalid API response when fetching popular movies.",
+    "loadFailure": "Failed to load popular movies. Please try again later."
+  },
+  "publicList": {
+    "loadingMessage": "Loading public list...",
+    "mainListBadge": "Main",
+    "listIdPrefix": "ID: ",
+    "noMoviesInList": "No movies in this list yet.",
+    "fetchError": "Error fetching public list."
+  },
+  "genreCarousel": {
+    "title": "Explore by Genre",
+    "loading": {
+      "srOnly": "Loading genres...",
+      "text": "Loading genres..."
+    },
+    "error": {
+      "apiResponse": "Invalid API response when fetching genres.",
+      "fetch": "Failed to load genres. Please try again later."
+    }
+  },
+  "movieList": {
+    "watchedOn": "Watched on:",
+    "na": "N/A",
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "updateDateTitle": "Change date",
+      "removeFromWatchedTitle": "Remove from watched",
+      "confirmDate": "Confirm Date"
+    },
+    "warnings": {
+      "noDateSelected": "No date selected for update."
+    }
+  },
+  "listDetails": {
+    "loading": {
+      "srOnly": "Loading...",
+      "text": "Loading list details..."
+    },
+    "mainBadge": "Main",
+    "idLabel": "ID:",
+    "noMovies": "No movies in this list yet.",
+    "shareListButton": "Share list",
+    "error": {
+      "authRequired": "You need to be logged in to view list details.",
+      "invalidTmdbIdConsole": "Could not extract a valid primitive TMDB ID from item:",
+      "fetchTmdbMovieConsole": "Error fetching TMDB movie ID {id} for list: {message}.",
+      "fetchListDetails": "Error fetching list details.",
+      "removeMovie": "Error removing movie from list."
+    },
+    "share": {
+      "success": "List link copied to clipboard!",
+      "prompt": "Copy the list link:"
+    }
+  },
+  "movieLists": {
+    "title": "My Lists",
+    "newListButton": "New list",
+    "loading": {
+      "srOnly": "Loading...",
+      "text": "Loading lists..."
+    },
+    "noLists": "You haven't created any lists yet.",
+    "defaultBadge": "Default",
+    "actions": {
+      "editTitle": "Edit name",
+      "deleteTitle": "Delete list"
+    },
+    "errors": {
+      "authRequired": "You need to be logged in to perform this action."
+    },
+    "prompts": {
+      "newListName": "Enter the name of the new list:",
+      "editListName": "New list name:",
+      "confirmDelete": "Are you sure you want to delete this list? This action cannot be undone."
+    }
+  },
+  "movieDetails": {
+    "director": "Director",
+    "synopsis": "Synopsis",
+    "noSynopsis": "Synopsis not available.",
+    "addToList": "Add to List",
+    "markAsWatched": "Mark as Watched",
+    "loading": {
+      "srOnly": "Loading...",
+      "text": "Loading movie details..."
+    },
+    "addToListModalTitle": "Add '{title}' to list:",
+    "confirmAddToList": "Confirm",
+    "noUserLists": "You have no lists. Create one first!",
+    "close": "Close",
+    "trailer": "Trailer",
+    "hourAbbr": "h",
+    "minAbbr": "min"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page"
+  },
+  "popularMovieCarousel": {
+    "title": "Popular Movies",
+    "loading": {
+      "srOnly": "Loading...",
+      "text": "Loading"
+    },
+    "error": {
+      "load": "Error loading movies."
+    },
+    "seeMore": "See more popular movies"
+  },
+  "watchedCount": {
+    "label": "{count} movie watched | {count} movies watched"
+  },
+  "watchedList": {
+    "title": "Watched Movies",
+    "startDate": "Start date:",
+    "endDate": "End date:",
+    "clearFilters": "Clear filters",
+    "loading": {
+      "srOnly": "Loading...",
+      "text": "Loading watched movies..."
+    },
+    "noMovies": "You haven't marked any movie as watched yet."
+  },
+  "watchedStats": {
+    "genres": "{count} genres in your watched movies"
+  },
+  "register": {
+    "title": "Create Account",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "registerButton": "Register",
+    "registeringButton": "Registering...",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginHereButton": "Login here",
+    "passwordsDontMatch": "Passwords do not match.",
+    "registerFailed": "Registration failed.",
+    "successRedirect": "Registration successful! Redirecting..."
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "myLists": "My Lists",
+    "watched": "Watched",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "madeWith": "Made with",
+    "andVue": "and Vue.js"
+  }
+}

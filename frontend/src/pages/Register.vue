@@ -4,27 +4,27 @@
       <div class="col-sm-10 col-md-8 col-lg-7">
         <div class="card bg-dark text-light shadow-lg">
           <div class="card-body p-4 p-md-5">
-            <h2 class="card-title text-center mb-4">Criar Conta</h2>
+            <h2 class="card-title text-center mb-4">{{ $t('register.title') }}</h2>
             <form @submit.prevent="handleRegister">
               <div class="mb-3">
-                <label for="name" class="form-label">Nome</label>
+                <label for="name" class="form-label">{{ $t('register.nameLabel') }}</label>
                 <input type="text" id="name" class="form-control form-control-lg bg-secondary text-light border-secondary" v-model="name" required />
               </div>
               <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
+                <label for="email" class="form-label">{{ $t('register.emailLabel') }}</label>
                 <input type="email" id="email" class="form-control form-control-lg bg-secondary text-light border-secondary" v-model="email" required />
               </div>
               <div class="mb-3">
-                <label for="password" class="form-label">Senha</label>
+                <label for="password" class="form-label">{{ $t('register.passwordLabel') }}</label>
                 <input type="password" id="password" class="form-control form-control-lg bg-secondary text-light border-secondary" v-model="password" required />
               </div>
               <div class="mb-3">
-                <label for="confirmPassword" class="form-label">Confirmar Senha</label>
+                <label for="confirmPassword" class="form-label">{{ $t('register.confirmPasswordLabel') }}</label>
                 <input type="password" id="confirmPassword" class="form-control form-control-lg bg-secondary text-light border-secondary" v-model="confirmPassword" required />
               </div>
               <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-lg" :disabled="isLoading">
-                  {{ isLoading ? 'Registrando...' : 'Registrar' }}
+                  {{ isLoading ? $t('register.registeringButton') : $t('register.registerButton') }}
                 </button>
               </div>
               <p v-if="error" class="text-danger mt-3 text-center">{{ error }}</p>
@@ -32,8 +32,8 @@
             </form>
             <hr class="my-4 border-secondary">
             <div class="text-center">
-              <p class="mb-2">Já tem uma conta?</p>
-              <button @click="goToLogin" class="btn btn-outline-light">Faça login aqui</button>
+              <p class="mb-2">{{ $t('register.alreadyHaveAccount') }}</p>
+              <button @click="goToLogin" class="btn btn-outline-light">{{ $t('register.loginHereButton') }}</button>
             </div>
           </div>
         </div>
@@ -45,9 +45,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth' // Importar o store Pinia
+import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
 import { apiPost } from '@/utils/api'
 
+const { t } = useI18n()
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -57,7 +59,7 @@ const successMessage = ref('')
 const isLoading = ref(false)
 
 const router = useRouter()
-const authStore = useAuthStore() // Usar o store Pinia
+const authStore = useAuthStore()
 
 async function handleRegister() {
   isLoading.value = true
@@ -65,7 +67,7 @@ async function handleRegister() {
   successMessage.value = ''
 
   if (password.value !== confirmPassword.value) {
-    error.value = 'As senhas não coincidem.'
+    error.value = t('register.passwordsDontMatch')
     isLoading.value = false
     return
   }
@@ -77,13 +79,12 @@ async function handleRegister() {
       password: password.value,
     })
     if (!data || data.error || data.msg) {
-      throw new Error(data.msg || data.error || 'Falha no registro.')
+      throw new Error(data.msg || data.error || t('register.registerFailed'))
     }
-    // Após o registro bem-sucedido, faz o login automaticamente
-    authStore.login(data) // Usa a action do store Pinia para logar o usuário
-    successMessage.value = 'Registro bem-sucedido! Redirecionando...'
+    authStore.login(data)
+    successMessage.value = t('register.successRedirect')
     setTimeout(() => {
-      router.push('/') // Redireciona para a home
+      router.push('/')
     }, 2000)
   } catch (err) {
     error.value = err.message

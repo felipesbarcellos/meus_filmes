@@ -1,20 +1,20 @@
 <template>  <div class="container mt-4 mb-5">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
-      <h2 class="h3 mb-2 mb-md-0">Filmes do Gênero: <span class="text-primary fw-bold">{{ genreName }}</span></h2>
-      <button class="btn btn-outline-secondary btn-sm" @click="router.back()">Voltar</button>
+      <h2 class="h3 mb-2 mb-md-0">{{ $t('genreMovies.title') }}<span class="text-primary fw-bold">{{ genreName }}</span></h2>
+      <button class="btn btn-outline-secondary btn-sm" @click="router.back()">{{ $t('genreMovies.backButton') }}</button>
     </div>
 
     <div v-if="loading && movies.length === 0" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
+        <span class="visually-hidden">{{ $t('general.loading') }}</span>
       </div>
-      <p class="mt-2">Carregando...</p>
+      <p class="mt-2">{{ $t('general.loading') }}</p>
     </div>
     <div v-else-if="error" class="alert alert-danger text-center" role="alert">
-      Erro ao carregar filmes. Por favor, tente novamente mais tarde.
+      {{ $t('genreMovies.loadingError') }}
     </div>
     <div v-else-if="movies.length === 0" class="alert alert-info text-center" role="alert">
-      Nenhum filme encontrado para este gênero.
+      {{ $t('genreMovies.noMoviesFound') }}
     </div>
     <div v-else>
       <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-2 g-md-3 g-lg-4">
@@ -39,10 +39,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { apiGet } from '@/utils/api'
-import PaginationControls from '@/components/PaginationControls.vue'; // Import the new component
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n'; // Import useI18n
+import { apiGet } from '@/utils/api';
+import PaginationControls from '@/components/PaginationControls.vue';
+
+const { t } = useI18n(); // Initialize t function
 
 const API_BASE_URL = '/api/tmdb'
 const route = useRoute()

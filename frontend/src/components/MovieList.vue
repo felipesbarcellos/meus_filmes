@@ -20,25 +20,25 @@
 
         <!-- Watched Actions -->
         <div v-if="showWatchedActions && movie.watched_at" class="card-footer p-2 bg-secondary bg-opacity-25">
-          <p class="text-light small mb-1 text-center">Assistido em: {{ formatDate(movie.watched_at) }}</p>
+          <p class="text-light small mb-1 text-center">{{ $t('movieList.watchedOn') }} {{ formatDate(movie.watched_at) }}</p>
           <div class="d-flex justify-content-around">
-            <button @click.stop="emitUpdateDate(movie.id)" class="btn btn-sm btn-outline-info p-1 flex-grow-1 me-1" title="Alterar data">
-              <i class="bi bi-calendar-event"></i> Editar
+            <button @click.stop="emitUpdateDate(movie.id)" class="btn btn-sm btn-outline-info p-1 flex-grow-1 me-1" :title="$t('movieList.actions.updateDateTitle')">
+              <i class="bi bi-calendar-event"></i> {{ $t('movieList.actions.edit') }}
             </button>
-            <button @click.stop="emitDelete(movie.id)" class="btn btn-sm btn-outline-danger p-1 flex-grow-1 ms-1" title="Remover dos assistidos">
-              <i class="bi bi-trash"></i> Deletar
+            <button @click.stop="emitDelete(movie.id)" class="btn btn-sm btn-outline-danger p-1 flex-grow-1 ms-1" :title="$t('movieList.actions.removeFromWatchedTitle')">
+              <i class="bi bi-trash"></i> {{ $t('movieList.actions.delete') }}
             </button>
           </div>
           <!-- Input para nova data (inicialmente escondido) -->
           <div v-if="movieToUpdateDate === movie.id" class="mt-2">
             <input type="date" v-model="newWatchedDate" class="form-control form-control-sm bg-dark text-light border-secondary" />
-            <button @click.stop="confirmUpdateDate(movie.id)" class="btn btn-sm btn-success w-100 mt-1">Confirmar Data</button>
+            <button @click.stop="confirmUpdateDate(movie.id)" class="btn btn-sm btn-success w-100 mt-1">{{ $t('movieList.actions.confirmDate') }}</button>
           </div> 
         </div>
         <!-- Remove from List Button -->
         <div v-if="showRemoveFromList" class="card-footer p-2 bg-secondary bg-opacity-10">
           <button @click.stop="emitRemoveFromList(movie.id)" class="btn btn-sm btn-outline-warning w-100">
-            <i class="bi bi-x-circle"></i> Deletar
+            <i class="bi bi-x-circle"></i> {{ $t('movieList.actions.delete') }} <!-- Assuming same delete text is fine -->
           </button>
         </div>
       </div>
@@ -48,7 +48,10 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref } from 'vue' // Import ref
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n' // Import useI18n
+
+const { t } = useI18n() // Initialize t
 
 const props = defineProps({
   movies: {
@@ -82,10 +85,11 @@ function getPosterUrl(path) {
 }
 
 function formatDate(dateString) {
-  if (!dateString) return 'N/A';
+  if (!dateString) return t('movieList.na'); // N/A translation
   const date = new Date(dateString);
   // Adjust for timezone issues if dateString is YYYY-MM-DD by treating it as UTC
   const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+  // TODO: Consider making locale for toLocaleDateString dynamic based on i18n.locale
   return utcDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
@@ -117,8 +121,7 @@ function emitUpdateDate(tmdbId) {
 
 function confirmUpdateDate(tmdbId) {
   if (!newWatchedDate.value) {
-    // Optionally, provide user feedback here (e.g., an alert or a small message)
-    console.warn("Nenhuma data selecionada para atualização.");
+    console.warn(t('movieList.warnings.noDateSelected'));
     return;
   }
   emit('update-watched-date', { tmdbId, newDate: newWatchedDate.value });

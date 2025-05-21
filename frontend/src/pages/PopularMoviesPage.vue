@@ -1,20 +1,20 @@
 <template>
   <div class="container py-4">
-    <h1 class="mb-4 text-light">Filmes Populares</h1>
+    <h1 class="mb-4 text-light">{{ $t('popularMovies.title') }}</h1>
 
     <div v-if="loading && movies.length === 0" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
+        <span class="visually-hidden">{{ $t('general.loading') }}</span>
       </div>
-      <p class="mt-3 text-secondary">Carregando filmes populares...</p>
+      <p class="mt-3 text-secondary">{{ $t('popularMovies.loadingMessage') }}</p>
     </div>
 
     <div v-else-if="error" class="alert alert-danger" role="alert">
-      {{ error }}
+      {{ error }} <!-- API error messages might need specific handling or generic keys -->
     </div>
 
     <div v-else-if="movies.length === 0 && !loading" class="alert alert-secondary text-center">
-      Nenhum filme popular encontrado no momento.
+      {{ $t('popularMovies.noMoviesFound') }}
     </div>
 
     <div v-else>
@@ -34,8 +34,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'; 
 import MovieList from '@/components/MovieList.vue';
-import PaginationControls from '@/components/PaginationControls.vue'; // Import the new component
+import PaginationControls from '@/components/PaginationControls.vue';
 import { apiGet } from '@/utils/api';
+import { useI18n } from 'vue-i18n'; // Import useI18n
+
+const { t } = useI18n(); // Initialize t function
 
 const movies = ref([]);
 const loading = ref(true);
@@ -60,11 +63,11 @@ async function fetchPopularMovies(page = 1) {
       movies.value = [];
       totalPages.value = 0;
       console.warn('Popular movies response did not contain results or total_pages:', data);
-      error.value = 'Resposta da API inválida ao buscar filmes populares.';
+      error.value = t('popularMovies.invalidResponse');
     }
   } catch (e) {
     console.error('Erro ao buscar filmes populares na página', page, ':', e);
-    error.value = e.message || 'Falha ao carregar filmes populares. Tente novamente mais tarde.';
+    error.value = e.message || t('popularMovies.loadFailure');
     // movies.value = []; // Keep existing movies on error if any
     // totalPages.value = 0; // Keep existing totalPages on error if any
   } finally {

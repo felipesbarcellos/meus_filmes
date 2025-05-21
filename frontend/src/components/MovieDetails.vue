@@ -13,7 +13,7 @@
                  :alt="movie.title" 
                  class="img-fluid rounded shadow-lg poster-img" />
             <div v-else class="bg-dark poster-placeholder rounded d-flex align-items-center justify-content-center text-secondary">
-              Sem Imagem
+              {{ $t('movieCard.noImage') }}
             </div>
           </div>
         </div>
@@ -25,11 +25,11 @@
               <p class="lead fst-italic text-light-emphasis mb-3" v-if="movie.tagline">{{ movie.tagline }}</p>
               
               <div class="d-flex flex-wrap gap-3 mb-3 text-secondary">
-                <span>{{ movie.release_date ? movie.release_date.substring(0, 4) : 'N/A' }}</span>
+                <span>{{ movie.release_date ? movie.release_date.substring(0, 4) : $t('movieList.na') }}</span>
                 <span class="text-secondary">|</span>
                 <span>{{ formatRuntime(movie.runtime) }}</span>
                 <span class="text-secondary">|</span>
-                <span>Diretor: {{ getDirector(movie.credits) }}</span>
+                <span>{{ $t('movieDetails.director') }}: {{ getDirector(movie.credits) }}</span>
               </div>
               
               <div class="mb-4">
@@ -39,19 +39,19 @@
                 </span>
               </div>
               
-              <h5 class="border-bottom border-primary pb-2 mb-3">Sinopse</h5>
-              <p class="text-light-emphasis">{{ movie.overview || "Sinopse não disponível." }}</p>
+              <h5 class="border-bottom border-primary pb-2 mb-3">{{ $t('movieDetails.synopsis') }}</h5>
+              <p class="text-light-emphasis">{{ movie.overview || $t('movieDetails.noSynopsis') }}</p>
 
               <!-- Actions Section -->
               <div class="mt-4 d-flex flex-wrap gap-3" v-if="authStore.isAuthenticated">
                 <button @click="showListModal = true" class="btn btn-primary">
-                  <i class="bi bi-plus-circle me-1"></i> Adicionar à Lista
+                  <i class="bi bi-plus-circle me-1"></i> {{ $t('movieDetails.addToList') }}
                 </button>
                 
                 <div class="d-flex flex-wrap gap-2 align-items-center">
                   <input type="date" v-model="watchedDate" class="form-control bg-dark text-light border-secondary"/>
                   <button @click="handleMarkAsWatched" class="btn btn-success">
-                    <i class="bi bi-check-circle me-1"></i> Marcar como Assistido
+                    <i class="bi bi-check-circle me-1"></i> {{ $t('movieDetails.markAsWatched') }}
                   </button>
                 </div>
               </div>
@@ -63,7 +63,7 @@
               
               <!-- Trailer Section -->
               <div v-if="getTrailerKey(movie.videos)" class="mt-5">
-                <h5 class="border-bottom border-primary pb-2 mb-3">Trailer</h5>
+                <h5 class="border-bottom border-primary pb-2 mb-3">{{ $t('movieDetails.trailer') }}</h5>
                 <div class="ratio ratio-16x9">
                   <iframe 
                     :src="`https://www.youtube.com/embed/${getTrailerKey(movie.videos)}`" 
@@ -81,9 +81,9 @@
   
   <div v-if="loading" class="d-flex justify-content-center align-items-center py-5 my-5">
     <div class="spinner-border text-primary me-3" role="status">
-      <span class="visually-hidden">Carregando...</span>
+      <span class="visually-hidden">{{ $t('movieDetails.loading.srOnly') }}</span>
     </div>
-    <p class="h5 text-secondary">Carregando detalhes do filme...</p>
+    <p class="h5 text-secondary">{{ $t('movieDetails.loading.text') }}</p>
   </div>
   
   <div v-if="error && !loading" class="alert alert-danger mx-auto my-5 text-center" style="max-width: 500px;">
@@ -95,7 +95,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-dark text-light">
         <div class="modal-header border-secondary">
-          <h5 class="modal-title">Adicionar "{{ movie.title }}" à lista:</h5>
+          <h5 class="modal-title">{{ $t('movieDetails.addToListModalTitle', { title: movie.title }) }}</h5>
           <button type="button" class="btn-close btn-close-white" aria-label="Close" @click="showListModal = false"></button>
         </div>
         <div class="modal-body">
@@ -103,14 +103,14 @@
             <select v-model="selectedListId" class="form-select bg-dark text-light border-secondary mb-3">
               <option v-for="list in userLists" :key="list.id" :value="list.id">{{ list.name }}</option>
             </select>
-            <button @click="handleAddToList" class="btn btn-primary w-100">Confirmar</button>
+            <button @click="handleAddToList" class="btn btn-primary w-100">{{ $t('movieDetails.confirmAddToList') }}</button>
           </div>
-          <p v-else class="text-center text-secondary">Você não possui listas. Crie uma primeiro!</p>
+          <p v-else class="text-center text-secondary">{{ $t('movieDetails.noUserLists') }}</p>
           <div v-if="addToListSuccess" class="alert alert-success mt-3">{{ addToListSuccess }}</div>
           <div v-if="addToListError" class="alert alert-danger mt-3">{{ addToListError }}</div>
         </div>
         <div class="modal-footer border-secondary">
-          <button @click="showListModal = false" class="btn btn-secondary">Fechar</button>
+          <button @click="showListModal = false" class="btn btn-secondary">{{ $t('movieDetails.close') }}</button>
         </div>
       </div>
     </div>
@@ -120,9 +120,11 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth' // Já importado
 import { apiGet, apiPost } from '@/utils/api' // Importar funções da API
 
+const { t } = useI18n()
 const API_BASE_URL = '/api/tmdb'
 const BACKEND_API_URL = '/api'
 
@@ -150,7 +152,7 @@ const fetchMovie = async () => {
     const data = await apiGet(`${API_BASE_URL}/movie/${route.params.id}?append_to_response=credits,videos`)
     movie.value = data
   } catch (e) {
-    error.value = e.message || "Erro ao buscar detalhes do filme."
+    error.value = e.message || t('movieDetails.fetchError')
     console.error("Erro ao buscar detalhes do filme:", e)
   } finally {
     loading.value = false
@@ -182,7 +184,7 @@ const handleAddToList = async () => {
       list_id: selectedListId.value,
       tmdb_id: movie.value.id,
     })
-    addToListSuccess.value = data.msg || 'Filme adicionado com sucesso!'
+    addToListSuccess.value = data.msg || t('movieDetails.addToListSuccess')
     setTimeout(() => { showListModal.value = false; addToListSuccess.value = ''; }, 2000)
   } catch (e) {
     console.error(e.message)
@@ -200,7 +202,7 @@ const handleMarkAsWatched = async () => {
       tmdb_id: movie.value.id,
       watched_at: watchedDate.value
     })
-    watchedSuccess.value = data.msg || 'Filme marcado como assistido!'
+    watchedSuccess.value = data.msg || t('movieDetails.markAsWatchedSuccess')
     setTimeout(() => { watchedSuccess.value = ''; }, 3000)
   } catch (e) {
     console.error(e.message)
@@ -216,13 +218,13 @@ function formatRuntime(minutes) {
   if (!minutes) return ''
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
-  return `${h}h ${m}min`
+  return `${h}${t('movieDetails.hourAbbr')} ${m}${t('movieDetails.minAbbr')}`
 }
 
 function getDirector(credits) {
-  if (!credits || !credits.crew) return 'N/A'
+  if (!credits || !credits.crew) return t('movieList.na')
   const director = credits.crew.find(person => person.job === 'Director')
-  return director ? director.name : 'N/A'
+  return director ? director.name : t('movieList.na')
 }
 
 function getTrailerKey(videos) {

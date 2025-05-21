@@ -82,17 +82,17 @@ onUnmounted(() => {
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <RouterLink to="/" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">Início</RouterLink>
+                <RouterLink to="/" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">{{ $t('nav.home') }}</RouterLink>
               </li>
               <li class="nav-item">
-                <RouterLink to="/buscar" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">Buscar</RouterLink>
+                <RouterLink to="/buscar" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">{{ $t('nav.search') }}</RouterLink>
               </li>
               <template v-if="authStore.isAuthenticated">
                 <li class="nav-item">
-                  <RouterLink to="/listas" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">Minhas Listas</RouterLink>
+                  <RouterLink to="/listas" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">{{ $t('nav.myLists') }}</RouterLink>
                 </li>
                 <li class="nav-item">
-                  <RouterLink to="/assistidos" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">Assistidos</RouterLink>
+                  <RouterLink to="/assistidos" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">{{ $t('nav.watched') }}</RouterLink>
                 </li>
               </template>
             </ul>
@@ -102,15 +102,15 @@ onUnmounted(() => {
                   <span class="nav-link text-warning">{{ authStore.userName }}</span>
                 </li>
                 <li class="nav-item">
-                  <button @click="handleLogout" class="btn btn-outline-danger btn-sm">Sair</button>
+                  <button @click="handleLogout" class="btn btn-outline-danger btn-sm">{{ $t('nav.logout') }}</button>
                 </li>
               </template>
               <template v-else>
                 <li class="nav-item">
-                  <RouterLink to="/login" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">Login</RouterLink>
+                  <RouterLink to="/login" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">{{ $t('nav.login') }}</RouterLink>
                 </li>
                 <li class="nav-item">
-                  <RouterLink to="/registrar" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">Registrar</RouterLink>
+                  <RouterLink to="/registrar" class="nav-link" active-class="active" @click="closeNavbarIfNeeded">{{ $t('nav.register') }}</RouterLink>
                 </li>
               </template>
             </ul>
@@ -125,8 +125,8 @@ onUnmounted(() => {
 
     <footer class="bg-dark text-light text-center py-2 py-md-3 mt-auto">
       <div class="container">
-        <p class="mb-1">&copy; {{ new Date().getFullYear() }} MeusFilmes. Todos os direitos reservados.</p>
-        <p class="mb-0">Feito com <span class="text-danger">&hearts;</span> e Vue.js</p>
+        <p class="mb-1">&copy; {{ new Date().getFullYear() }} MeusFilmes. {{ $t('footer.rights') }}</p>
+        <p class="mb-0">{{ $t('footer.madeWith') }} <span class="text-danger">&hearts;</span> {{ $t('footer.andVue') }}</p>
       </div>
     </footer>
   </div>

@@ -1,12 +1,12 @@
 <template>
   <div class="container-fluid py-3 py-md-4 bg-dark rounded shadow-sm mb-3 mb-md-4">
-    <h2 class="h5 h4-md mb-2 mb-md-3 text-light">Gêneros</h2>
+    <h2 class="h5 h4-md mb-2 mb-md-3 text-light">{{ $t('genreCarousel.title') }}</h2>
     
     <div v-if="loading" class="text-center py-4">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
+        <span class="visually-hidden">{{ $t('genreCarousel.loading.srOnly') }}</span>
       </div>
-      <p class="mt-2 text-secondary">Carregando</p>
+      <p class="mt-2 text-secondary">{{ $t('genreCarousel.loading.text') }}</p>
     </div>
     
     <div v-else-if="error" class="alert alert-danger py-2" role="alert">
@@ -39,7 +39,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { apiGet } from '@/utils/api'
+
+const { t } = useI18n()
 
 const props = defineProps({
   type: {
@@ -82,11 +85,11 @@ const fetchGenres = async () => {
     const endpoint = props.type === 'tv' ? 'tv/genres' : 'movie/genres'
     const data = await apiGet(`${API_BASE_URL}/${endpoint}`)
     if (!data || !Array.isArray(data.genres)) {
-      throw new Error('Resposta inesperada da API de gêneros.')
+      throw new Error(t('genreCarousel.error.apiResponse'))
     }
     genres.value = data.genres
   } catch (e) {
-    error.value = e.message || 'Erro ao buscar gêneros.'
+    error.value = e.message || t('genreCarousel.error.fetch')
     genres.value = []
     console.error('Erro ao buscar gêneros:', e)
   } finally {
