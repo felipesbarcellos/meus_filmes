@@ -12,11 +12,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from extensions import db
 from models import User, List
 
-# Import mock mail for development
-try:
-    from mock_mail import MockMail
-except ImportError:
-    MockMail = None
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -110,29 +105,18 @@ def recovery():
         current_app.logger.info(f"Mail server: {current_app.config['MAIL_SERVER']}:{current_app.config['MAIL_PORT']}")
         current_app.logger.info(f"TLS: {current_app.config['MAIL_USE_TLS']}, SSL: {current_app.config['MAIL_USE_SSL']}")
         
-        # Use mock mail for development if configured
-        if os.environ.get('USE_MOCK_MAIL', 'False').lower() in ['true', '1', 'yes']:
-            current_app.logger.info("Using mock mail service for development")
-            if MockMail:
-                mock_mail = MockMail()
-                mock_mail.send(recovery_message)
-                current_app.logger.info("Mock email sent successfully")
-            else:
-                current_app.logger.error("MockMail class not available")
-        else:
-            # Try to send email with retry logic
-            max_retries = 3
-            for attempt in range(max_retries):
-                try:
-                    mail.send(recovery_message)
-                    current_app.logger.info(f"Email sent successfully on attempt {attempt + 1}")
-                    break
-                except Exception as retry_error:
-                    current_app.logger.warning(f"Attempt {attempt + 1} failed: {str(retry_error)}")
-                    if attempt == max_retries - 1:
-                        raise retry_error
-                    import time
-                    time.sleep(2)  # Wait 2 seconds before retry
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                mail.send(recovery_message)
+                current_app.logger.info(f"Email sent successfully on attempt {attempt + 1}")
+                break
+            except Exception as retry_error:
+                current_app.logger.warning(f"Attempt {attempt + 1} failed: {str(retry_error)}")
+                if attempt == max_retries - 1:
+                    raise retry_error
+                import time
+                time.sleep(2)  # Wait 2 seconds before retry
                 
     except Exception as e:
         current_app.logger.error(f"Failed to send recovery email: {str(e)}")
