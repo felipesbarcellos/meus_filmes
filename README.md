@@ -4,7 +4,7 @@ This project was created to keep track of movies watched and view related statis
 
 ## Online Demo
 
-You can test the application at: [https://humorous-pretty-glider.ngrok-free.app/](https://humorous-pretty-glider.ngrok-free.app/)
+You can test the application at: [https://meusfilmes.loophole.site/](https://meusfilmes.loophole.site/)
 
 ## Prerequisites
 
