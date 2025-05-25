@@ -1,11 +1,11 @@
 import os
 from flask import Flask, jsonify, abort
+from flask_mail import Mail
 from flask_swagger_ui import get_swaggerui_blueprint
 import yaml
 
 # Import extensions and Blueprints - using absolute imports from current directory
-from extensions import db, cors
-from api import api_v1_bp
+from extensions import db, cors, mail
 
 def create_app(config_name=None):
     app = Flask(__name__)
@@ -17,12 +17,27 @@ def create_app(config_name=None):
     app.config['TMDB_BASE_URL'] = os.environ.get("TMDB_BASE_URL", "https://api.themoviedb.org/3")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', '')
+    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
+    app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() in ['true', '1', 'yes']
+    app.config['MAIL_USE_SSL'] = os.environ.get('MAIL_USE_SSL', 'False').lower() in ['true', '1', 'yes']
+    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+    app.config['MAIL_TIMEOUT'] = int(os.environ.get('MAIL_TIMEOUT', 30))
+    app.config['MAIL_MAX_EMAILS'] = int(os.environ.get('MAIL_MAX_EMAILS', 50))
+
+    app.config['FRONTEND_URL'] = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+
     if not app.config['TMDB_API_KEY']:
         print("ALERT: TMDB_API_KEY is not configured in .env file!")
 
     # Initialize extensions
+    mail.init_app(app)
+    
     db.init_app(app)
-    cors.init_app(app, origins=["http://localhost:5173"])
+    
+    cors.init_app(app, origins=["http://localhost:5173", os.environ.get('FRONTEND_URL')], supports_credentials=True)
 
     # Swagger UI setup
     SWAGGER_URL = '/api/docs'  # URL for exposing Swagger UI (without trailing slash)

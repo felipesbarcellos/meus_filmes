@@ -16,6 +16,7 @@ dependencies = [
     "pymysql",
     "gunicorn",
     "cryptography",
+    "Flask-Mail"
 ]
 
 [build-system]
