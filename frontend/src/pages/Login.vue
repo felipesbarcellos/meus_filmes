@@ -26,6 +26,9 @@
               <p class="mb-2">{{ $t('login.noAccount') }}</p>
               <button @click="goToRegister" class="btn btn-outline-light">{{ $t('login.createAccountButton') }}</button>
             </div>
+            <div class="text-center mt-3">
+              <RouterLink to="/recovery" class="link-light">{{$t('recovery.title')}}</RouterLink>
+            </div>
           </div>
         </div>
       </div>

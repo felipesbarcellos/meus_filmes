@@ -13,6 +13,8 @@ import MovieLists from './components/MovieLists.vue'
 import ListDetails from './components/ListDetails.vue'
 import WatchedList from './components/WatchedList.vue'
 import PopularMoviesPage from './pages/PopularMoviesPage.vue'
+import Recovery from './pages/Recovery.vue'
+import ResetPassword from './pages/ResetPassword.vue'
 import { useAuthStore } from './stores/auth' // Importar o store de autenticação
 import { setupApi } from './utils/api' // Importar configuração de API
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -30,11 +32,6 @@ const routes = [
   { path: '/genre/:id', component: GenreMovies, props: true },
   { path: '/registrar', component: Register },
   { path: '/login', component: Login },
-  {
-    path: '/minhas-listas',
-    component: MovieLists,
-    meta: { requiresAuth: true } // Adiciona meta para indicar rota protegida
-  },
   {
     path: '/listas',
     component: MovieLists,
@@ -58,7 +55,9 @@ const routes = [
     path: '/listas/publica/:id',
     component: () => import('./pages/PublicList.vue'),
     // Public, no auth required
-  }
+  },
+  { path: '/recovery', component: Recovery },
+  { path: '/recovery/:token', component: ResetPassword }
 ]
 
 const router = createRouter({

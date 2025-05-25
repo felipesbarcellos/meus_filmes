@@ -191,5 +191,38 @@
     "rights": "Todos os direitos reservados.",
     "madeWith": "Feito com",
     "andVue": "e Vue.js"
+  },  "recovery": {
+    "title": "Recuperar Senha",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Digite seu email",
+    "sendButton": "Enviar e-mail de recuperação",
+    "successMsg": "Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha.",
+    "backToLogin": "Voltar para o login"
+  },  "resetPassword": {
+    "title": "Redefinir Senha",
+    "validatingToken": "Validando token...",
+    "tokenError": "Token Inválido",
+    "noToken": "Token não fornecido na URL.",
+    "tokenExpired": "O token expirou. Solicite uma nova recuperação de senha.",
+    "invalidToken": "Token inválido. Verifique o link do e-mail.",
+    "userNotFound": "Usuário não encontrado.",
+    "missingFields": "Token ou senha não fornecidos.",
+    "endpointNotFound": "Serviço não encontrado. Verifique a configuração do servidor.",
+    "serverError": "Erro interno do servidor. Tente novamente em alguns minutos.",
+    "requestNew": "Solicitar Nova Recuperação",
+    "newPasswordLabel": "Nova Senha",
+    "newPasswordPlaceholder": "Digite sua nova senha",
+    "confirmPasswordLabel": "Confirmar Senha",
+    "confirmPasswordPlaceholder": "Confirme sua nova senha",
+    "passwordTooShort": "A senha deve ter pelo menos 6 caracteres.",
+    "passwordsDontMatch": "As senhas não coincidem.",
+    "resetButton": "Redefinir Senha",
+    "successMsg": "Senha redefinida com sucesso! Você pode fazer login agora.",
+    "generalError": "Erro ao redefinir senha. Tente novamente.",
+    "goToLogin": "Ir para Login",
+    "backToLogin": "Voltar para o login"
+  },
+  "common": {
+    "loading": "Carregando..."
   }
 }

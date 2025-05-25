@@ -191,5 +191,35 @@
     "rights": "All rights reserved.",
     "madeWith": "Made with",
     "andVue": "and Vue.js"
+  },  "recovery": {
+    "title": "Password Recovery",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "sendButton": "Send recovery email",
+    "successMsg": "If your email is registered, you will receive instructions to reset your password.",
+    "backToLogin": "Back to login"
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "validatingToken": "Validating token...",
+    "tokenError": "Invalid Token",
+    "noToken": "No token provided in URL.",
+    "tokenExpired": "The token has expired. Please request a new password recovery.",
+    "invalidToken": "Invalid token. Please check the email link.",
+    "requestNew": "Request New Recovery",
+    "newPasswordLabel": "New Password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your new password",
+    "passwordTooShort": "Password must be at least 6 characters long.",
+    "passwordsDontMatch": "Passwords do not match.",
+    "resetButton": "Reset Password",
+    "successMsg": "Password reset successfully! You can log in now.",
+    "generalError": "Error resetting password. Please try again.",
+    "goToLogin": "Go to Login",
+    "backToLogin": "Back to login"
+  },
+  "common": {
+    "loading": "Loading..."
   }
 }
