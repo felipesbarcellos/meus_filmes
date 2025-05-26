@@ -36,8 +36,9 @@ def create_app(config_name=None):
     mail.init_app(app)
     
     db.init_app(app)
-    
-    cors.init_app(app, origins=["http://localhost:5173", os.environ.get('FRONTEND_URL')], supports_credentials=True)
+    origins = ["http://localhost:5173", os.environ.get('FRONTEND_URL')]
+    origins = [o for o in origins if o is not None]  # Filter out None values
+    cors.init_app(app, origins=origins, supports_credentials=True)
 
     # Swagger UI setup
     SWAGGER_URL = '/api/docs'  # URL for exposing Swagger UI (without trailing slash)
