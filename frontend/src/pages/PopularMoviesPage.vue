@@ -32,13 +32,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'; 
+import { ref, onMounted, watch } from 'vue'; 
 import MovieList from '@/components/MovieList.vue';
 import PaginationControls from '@/components/PaginationControls.vue';
 import { apiGet } from '@/utils/api';
 import { useI18n } from 'vue-i18n'; // Import useI18n
 
-const { t } = useI18n(); // Initialize t function
+const { t, locale } = useI18n(); // Initialize t and locale
 
 const movies = ref([]);
 const loading = ref(true);
@@ -51,14 +51,13 @@ const API_BASE_URL = '/api/tmdb';
 async function fetchPopularMovies(page = 1) {
   loading.value = true;
   error.value = '';
-  // Clear movies only if it's a direct page load, not for subsequent loading states of the same page
-  // movies.value = []; // Let's keep old movies visible while new ones load for a better UX
   try {
-    const data = await apiGet(`${API_BASE_URL}/popular?page=${page}`);
+    const lang = locale.value === 'en' ? 'en-US' : 'pt-BR';
+    const data = await apiGet(`${API_BASE_URL}/popular?page=${page}&language=${lang}`);
     if (data && data.results) {
       movies.value = data.results;
       totalPages.value = data.total_pages || 0;
-      currentPage.value = data.page || page; // Ensure currentPage reflects the API's response
+      currentPage.value = data.page || page;
     } else {
       movies.value = [];
       totalPages.value = 0;
@@ -68,8 +67,6 @@ async function fetchPopularMovies(page = 1) {
   } catch (e) {
     console.error('Erro ao buscar filmes populares na página', page, ':', e);
     error.value = e.message || t('popularMovies.loadFailure');
-    // movies.value = []; // Keep existing movies on error if any
-    // totalPages.value = 0; // Keep existing totalPages on error if any
   } finally {
     loading.value = false;
   }
@@ -81,6 +78,10 @@ function handlePageChange(newPage) {
 }
 
 onMounted(() => {
+  fetchPopularMovies(currentPage.value);
+});
+
+watch(locale, () => {
   fetchPopularMovies(currentPage.value);
 });
 
