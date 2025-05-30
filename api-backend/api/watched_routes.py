@@ -36,12 +36,12 @@ def add_watched_movie(auth_user_id):
         existing_watched.watched_at = watched_at_dt
         db.session.commit()
         watched_obj = existing_watched
-        msg = "Watched date updated"
+        msg = "Data de assistido atualizada com sucesso"
     else:
         watched_obj = Watched(user_id=auth_user_id, tmdb_id=tmdb_id, watched_at=watched_at_dt)
         db.session.add(watched_obj)
         db.session.commit()
-        msg = "Watched movie added"
+        msg = "Filme adicionado com sucesso"
 
     # Adiciona também na lista "Assistidos"
     assistidos_list = List.query.filter_by(user_id=auth_user_id, is_main=True, name="Assistidos").first()
