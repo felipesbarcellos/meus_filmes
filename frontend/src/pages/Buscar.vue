@@ -25,7 +25,7 @@
             v-for="suggestion in suggestions" 
             :key="suggestion.id" 
             class="list-group-item list-group-item-action bg-dark text-light border-secondary suggestion-item"
-            @mousedown="selectSuggestion(suggestion)"
+            @click="selectSuggestion(suggestion)"
             role="option"
             tabindex="0"
             @keydown.enter="selectSuggestion(suggestion)"
@@ -80,20 +80,7 @@
     <!-- Final Results Display -->
     <div v-if="finalResults.length > 0 && !loadingFinalResults" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
       <div v-for="movie in finalResults" :key="movie.id" class="col">
-        <div class="card h-100 bg-dark text-light border-secondary movie-card" @click="goToMovie(movie.id)">
-          <div class="poster-container bg-dark">
-            <img :src="getPosterUrl(movie.poster_path)" :alt="movie.title" class="card-img-top movie-poster" v-if="movie.poster_path" />
-            <div v-else class="d-flex justify-content-center align-items-center h-100 text-secondary">
-              {{ $t('movieCard.noImage') }}
-            </div>
-          </div>
-          <div class="card-body">
-            <h5 class="card-title">{{ movie.title }}</h5>
-            <p class="card-text small text-secondary" v-if="movie.release_date && movie.release_date.length >=4">
-              {{ $t('movieCard.release') }}: {{ movie.release_date.substring(0, 4) }}
-            </p>
-          </div>
-        </div>
+        <MovieCard :movie="movie" />
       </div>
     </div>
   </div>
@@ -104,8 +91,9 @@ import { ref, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n'; // Import useI18n
 import { apiGet } from '@/utils/api';
+import MovieCard from '@/components/MovieCard.vue'
 
-const { t } = useI18n(); // Initialize t function for script block usage if needed (not strictly for template)
+const { t, locale } = useI18n(); // Initialize t and locale
 
 const API_BASE_URL = '/api/tmdb';
 
@@ -127,21 +115,20 @@ let internalQueryUpdate = false; // Flag to prevent watch from re-fetching sugge
 async function fetchSuggestions(searchTerm) {
   if (!searchTerm.trim()) {
     suggestions.value = [];
-    // Do not hide showSuggestionsList here, let blur or selection handle it
     return;
   }
   loadingSuggestions.value = true;
   try {
-    const data = await apiGet(`${API_BASE_URL}/search?query=${encodeURIComponent(searchTerm)}&page=1`);
-    suggestions.value = (data.results || []).slice(0, 7); // Show up to 7 suggestions
-    // Ensure list is shown if there are suggestions or if query is active to show "no suggestions"
+    const lang = locale.value === 'en' ? 'en-US' : 'pt-BR';
+    const data = await apiGet(`${API_BASE_URL}/search?query=${encodeURIComponent(searchTerm)}&page=1&language=${lang}`);
+    suggestions.value = (data.results || []).slice(0, 7);
     if (query.value.trim()) {
         showSuggestionsList.value = true;
     }
   } catch (e) {
     console.error("Erro ao buscar sugestões:", e);
     suggestions.value = [];
-    if (query.value.trim()) { // Keep "no suggestions" visible if query is still there
+    if (query.value.trim()) {
         showSuggestionsList.value = true;
     }
   } finally {
@@ -164,19 +151,29 @@ async function fetchFinalResults(searchTerm) {
   showSuggestionsList.value = false;
 
   try {
-    const data = await apiGet(`${API_BASE_URL}/search?query=${encodeURIComponent(searchTerm)}`);
+    const lang = locale.value === 'en' ? 'en-US' : 'pt-BR';
+    const data = await apiGet(`${API_BASE_URL}/search?query=${encodeURIComponent(searchTerm)}&language=${lang}`);
     finalResults.value = data.results || [];
     searched.value = true;
     queryWhenSearched.value = searchTerm;
   } catch (e) {
-    // Consider using a generic error key if API error messages are not localized
-    error.value = e.message || t('search.fetchError'); // Example: t('search.fetchError')
+    error.value = e.message || t('search.fetchError');
     console.error("Erro ao buscar filmes:", e);
     finalResults.value = [];
   } finally {
     loadingFinalResults.value = false;
   }
 }
+
+// Atualiza sugestões e resultados ao trocar idioma
+watch(locale, () => {
+  if (query.value.trim()) {
+    fetchSuggestions(query.value);
+    if (searched.value) {
+      fetchFinalResults(query.value);
+    }
+  }
+});
 
 watch(query, (newQuery) => {
   if (internalQueryUpdate) {
@@ -204,10 +201,9 @@ function selectSuggestion(movie) {
   internalQueryUpdate = true;
   query.value = movie.title;
   showSuggestionsList.value = false;
-  suggestions.value = []; 
-  
-  fetchFinalResults(movie.title);
-
+  suggestions.value = [];
+  // Navega direto para a página de detalhes do filme
+  router.push(`/movie/${movie.id}`);
   nextTick(() => {
     internalQueryUpdate = false;
   });
