@@ -3,9 +3,11 @@ import { RouterView, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { locale } = useI18n()
 
 const closeNavbarIfNeeded = () => {
   const collapsibleNavbarElement = document.getElementById('navbarNav');
@@ -66,6 +68,10 @@ onUnmounted(() => {
     window.removeEventListener('resize', logScreenSize);
   }
 });
+
+function toggleLanguage() {
+  locale.value = locale.value === 'en' ? 'pt' : 'en'
+}
 </script>
 
 <template>
@@ -96,7 +102,13 @@ onUnmounted(() => {
                 </li>
               </template>
             </ul>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center"> <!-- Added align-items-center for better vertical alignment -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+              <li class="nav-item">
+                <button class="btn btn-outline-light d-flex align-items-center gap-1" @click="toggleLanguage" style="font-weight: bold;">
+                  <i class="bi bi-globe2"></i>
+                  <span style="font-size: 1rem; letter-spacing: 1px;">{{ locale.toUpperCase().slice(0,2) }}</span>
+                </button>
+              </li>
               <template v-if="authStore.isAuthenticated">
                 <li class="nav-item">
                   <span class="nav-link text-warning">{{ authStore.userName }}</span>
