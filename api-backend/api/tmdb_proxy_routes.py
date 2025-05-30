@@ -29,19 +29,13 @@ def get_popular_movies():
     if not TMDB_API_KEY:
         return jsonify({"error": "TMDB API key not configured"}), 500
     page = request.args.get("page", 1)
+    language = request.args.get("language", "pt-BR")
     try:
         response = requests.get(
-            f"{TMDB_BASE_URL}/movie/popular?api_key={TMDB_API_KEY}&language=pt-BR&page={page}"
+            f"{TMDB_BASE_URL}/movie/popular?api_key={TMDB_API_KEY}&language={language}&page={page}"
         )
         response.raise_for_status()
         data = response.json()
-
-        # Removed call to _save_movie_details_if_not_exist
-        # if data and "results" in data:
-        #     for movie_summary in data["results"]:
-        #         if movie_summary and movie_summary.get("id"):
-        #             _save_movie_details_if_not_exist(movie_summary.get("id"))
-        
         return jsonify(data)
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
@@ -52,18 +46,23 @@ def get_movie_details(tmdb_id):
     if not TMDB_API_KEY:
         return jsonify({"error": "TMDB API key not configured"}), 500
     
+    append_to_response = request.args.get("append_to_response")
+    language = request.args.get("language")
     try:
-        # _save_movie_details_if_not_exist will:
-        # 1. Return the Movie object from DB if it exists.
-        # 2. If not in DB, fetch from TMDB (basic details), save to DB, and return the new Movie object.
-        # 3. Return None if not in DB and TMDB fetch fails.
-        movie_object = _save_movie_details_if_not_exist(tmdb_id)
+        # Se language for diferente de pt-BR, busca direto da TMDB e retorna (não usa banco)
+        if language and language != "pt-BR":
+            url = f"{TMDB_BASE_URL}/movie/{tmdb_id}?api_key={TMDB_API_KEY}&language={language}"
+            if append_to_response:
+                url += f"&append_to_response={append_to_response}"
+            tmdb_response = requests.get(url)
+            if tmdb_response.status_code == 200:
+                return jsonify(tmdb_response.json())
+            else:
+                return jsonify({"error": f"Could not fetch movie from TMDB: {tmdb_response.text}"}), 404
 
+        # Caso padrão: usa banco local e só busca extras da TMDB se solicitado
+        movie_object = _save_movie_details_if_not_exist(tmdb_id)
         if movie_object:
-            # Movie is in our DB (either pre-existing or just fetched and saved).
-            # Serialize and return the data from our Movie object.
-            # Note: This response will only contain fields stored in the Movie model,
-            # and will not include data from TMDB's 'append_to_response' (e.g., credits, recommendations).
             movie_dict = {
                 "id": movie_object.tmdb_id,
                 "title": movie_object.title,
@@ -71,11 +70,23 @@ def get_movie_details(tmdb_id):
                 "poster_path": movie_object.poster_path,
                 "release_date": movie_object.release_date.isoformat() if movie_object.release_date else None,
                 "vote_average": movie_object.rating,
-                "genres": movie_object.genres  # Assumed to be JSON-serializable (list of dicts)
+                "genres": movie_object.genres,
+                "runtime": getattr(movie_object, "runtime", None)
             }
+            if append_to_response:
+                url = f"{TMDB_BASE_URL}/movie/{tmdb_id}?api_key={TMDB_API_KEY}&language=pt-BR&append_to_response={append_to_response}"
+                tmdb_response = requests.get(url)
+                if tmdb_response.status_code == 200:
+                    tmdb_data = tmdb_response.json()
+                    if "runtime" in tmdb_data:
+                        movie_dict["runtime"] = tmdb_data["runtime"]
+                    for key in append_to_response.split(","):
+                        if key in tmdb_data:
+                            movie_dict[key] = tmdb_data[key]
+                else:
+                    current_app.logger.warning(f"Could not fetch append_to_response for TMDB ID {tmdb_id}: {tmdb_response.text}")
             return jsonify(movie_dict)
         else:
-            # Movie not found in DB and could not be fetched/saved by _save_movie_details_if_not_exist.
             return jsonify({"error": f"Movie with TMDB ID {tmdb_id} not found or could not be retrieved."}), 404
         
     except Exception as e:
@@ -89,11 +100,12 @@ def search_movies():
         return jsonify({"error": "TMDB API key not configured"}), 500
     query = request.args.get("query")
     page = request.args.get("page", 1)
+    language = request.args.get("language", "pt-BR")
     if not query:
         return jsonify({"error": "Search query is required"}), 400
     try:
         response = requests.get(
-            f"{TMDB_BASE_URL}/search/movie?api_key={TMDB_API_KEY}&language=pt-BR&query={query}&page={page}"
+            f"{TMDB_BASE_URL}/search/movie?api_key={TMDB_API_KEY}&language={language}&query={query}&page={page}"
         )
         response.raise_for_status()
         data = response.json()
@@ -128,19 +140,18 @@ def get_movie_recommendations(tmdb_id):
     if not TMDB_API_KEY:
         return jsonify({"error": "TMDB API key not configured"}), 500
     page = request.args.get("page", 1)
+    language = request.args.get("language", "pt-BR")
     try:
         response = requests.get(
-            f"{TMDB_BASE_URL}/movie/{tmdb_id}/recommendations?api_key={TMDB_API_KEY}&language=pt-BR&page={page}"
+            f"{TMDB_BASE_URL}/movie/{tmdb_id}/recommendations?api_key={TMDB_API_KEY}&language={language}&page={page}"
         )
         response.raise_for_status()
         data = response.json()
-
         # Removed call to _save_movie_details_if_not_exist
         # if data and "results" in data:
         #     for movie_summary in data["results"]:
         #         if movie_summary and movie_summary.get("id"):
         #             _save_movie_details_if_not_exist(movie_summary.get("id"))
-
         return jsonify(data)
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
@@ -166,9 +177,10 @@ def get_movie_genres():
     TMDB_API_KEY = current_app.config.get("TMDB_API_KEY")
     if not TMDB_API_KEY:
         return jsonify({"error": "TMDB API key not configured"}), 500
+    language = request.args.get("language", "pt-BR")
     try:
         response = requests.get(
-            f"{TMDB_BASE_URL}/genre/movie/list?api_key={TMDB_API_KEY}&language=pt-BR"
+            f"{TMDB_BASE_URL}/genre/movie/list?api_key={TMDB_API_KEY}&language={language}"
         )
         response.raise_for_status()
         return jsonify(response.json())
@@ -185,13 +197,14 @@ def discover_movies():
     # Get parameters from request
     genre_id = request.args.get("with_genres")
     page = request.args.get("page", 1)
+    language = request.args.get("language", "pt-BR")
     
     if not genre_id:
         return jsonify({"error": "Genre ID (with_genres) is required"}), 400
     
     try:
         response = requests.get(
-            f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&language=pt-BR&with_genres={genre_id}&page={page}"
+            f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&language={language}&with_genres={genre_id}&page={page}"
         )
         response.raise_for_status()
         data = response.json()
