@@ -129,7 +129,8 @@
     "close": "Close",
     "trailer": "Trailer",
     "hourAbbr": "h",
-    "minAbbr": "min"
+    "minAbbr": "min",
+    "recommendations": "Recommendations"
   },
   "pagination": {
     "previous": "Previous",

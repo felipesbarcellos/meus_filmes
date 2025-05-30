@@ -60,12 +60,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { ref, onMounted, computed, onUnmounted, watch } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { apiGet } from '@/utils/api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const API_BASE_URL = '/api/tmdb' // URL base do seu backend para TMDB
 
@@ -103,12 +103,18 @@ onMounted(() => {
   fetchMovies()
 })
 
+// Atualiza filmes populares ao mudar o idioma
+watch(locale, () => {
+  fetchMovies()
+  currentIndex.value = 0 // Garante que o carrossel volte ao início ao trocar idioma
+})
+
 const fetchMovies = async () => {
   loading.value = true
   error.value = false
   try {
-    // apiGet já retorna o JSON, não precisa .json()
-    const data = await apiGet(`${API_BASE_URL}/popular?page=1`)
+    const lang = locale.value === 'en' ? 'en-US' : 'pt-BR'
+    const data = await apiGet(`${API_BASE_URL}/popular?page=1&language=${lang}`)
     movies.value = data.results || []
   } catch (e) {
     error.value = true

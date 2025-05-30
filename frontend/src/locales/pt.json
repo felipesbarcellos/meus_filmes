@@ -129,7 +129,8 @@
     "close": "Fechar",
     "trailer": "Trailer",
     "hourAbbr": "h",
-    "minAbbr": "min"
+    "minAbbr": "min",
+    "recommendations": "Recomendações"
   },
   "pagination": {
     "previous": "Anterior",

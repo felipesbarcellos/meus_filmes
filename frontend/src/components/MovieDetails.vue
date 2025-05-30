@@ -21,7 +21,12 @@
         <div class="col-md-8">
           <div class="card bg-dark text-light">
             <div class="card-body p-4">
-              <h1 class="display-5 text-primary mb-1">{{ movie.title }}</h1>
+              <h1 class="display-5 text-primary mb-1 d-flex align-items-center gap-3">
+                {{ movie.title }}
+                <span v-if="movie.vote_average" class="badge bg-success fs-5 align-middle">
+                  <i class="bi bi-star-fill text-warning me-1"></i>{{ movie.vote_average.toFixed(1) }}
+                </span>
+              </h1>
               <p class="lead fst-italic text-light-emphasis mb-3" v-if="movie.tagline">{{ movie.tagline }}</p>
               
               <div class="d-flex flex-wrap gap-3 mb-3 text-secondary">
@@ -33,8 +38,10 @@
               </div>
               
               <div class="mb-4">
-                <span v-for="genre in movie.genres" :key="genre.id" 
-                      class="badge bg-primary bg-opacity-75 me-2 mb-2 py-2 px-3 rounded-pill">
+                <span v-for="genre in movie.genres" :key="genre.id"
+                      class="badge bg-primary bg-opacity-75 me-2 mb-2 py-2 px-3 rounded-pill genre-badge"
+                      @click="goToGenre(genre.id)"
+                      style="cursor:pointer">
                   {{ genre.name }}
                 </span>
               </div>
@@ -43,17 +50,9 @@
               <p class="text-light-emphasis">{{ movie.overview || $t('movieDetails.noSynopsis') }}</p>
 
               <!-- Actions Section -->
-              <div class="mt-4 d-flex flex-wrap gap-3" v-if="authStore.isAuthenticated">
-                <button @click="showListModal = true" class="btn btn-primary">
-                  <i class="bi bi-plus-circle me-1"></i> {{ $t('movieDetails.addToList') }}
-                </button>
-                
-                <div class="d-flex flex-wrap gap-2 align-items-center">
-                  <input type="date" v-model="watchedDate" class="form-control bg-dark text-light border-secondary"/>
-                  <button @click="handleMarkAsWatched" class="btn btn-success">
-                    <i class="bi bi-check-circle me-1"></i> {{ $t('movieDetails.markAsWatched') }}
-                  </button>
-                </div>
+              <!-- Substituir a seção de ações pelo novo componente AdicionarLista -->
+              <div class="mt-4" v-if="authStore.isAuthenticated && movie">
+                <AdicionarLista :movie-id="movie.id" />
               </div>
               
               <div class="mt-3">
@@ -78,7 +77,7 @@
       </div>
     </div>
   </div>
-  
+  <MovieRecommendations :tmdb-id="movie.id" :language="locale === 'en' ? 'en-US' : 'pt-BR'" v-if="movie && movie.id" />
   <div v-if="loading" class="d-flex justify-content-center align-items-center py-5 my-5">
     <div class="spinner-border text-primary me-3" role="status">
       <span class="visually-hidden">{{ $t('movieDetails.loading.srOnly') }}</span>
@@ -119,19 +118,21 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth' // Já importado
 import { apiGet, apiPost } from '@/utils/api' // Importar funções da API
+import AdicionarLista from './AdicionarLista.vue'
+import MovieRecommendations from './MovieRecommendations.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const API_BASE_URL = '/api/tmdb'
 const BACKEND_API_URL = '/api'
 
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore() // Instância do store já criada
 
-// ... existing refs ...
 const movie = ref(null)
 const loading = ref(true)
 const error = ref(false)
@@ -148,8 +149,9 @@ const fetchMovie = async () => {
   loading.value = true
   error.value = false
   try {
-    // Usa apiGet e já recebe o JSON
-    const data = await apiGet(`${API_BASE_URL}/movie/${route.params.id}?append_to_response=credits,videos`)
+    // Define o idioma da API TMDB conforme o locale
+    const lang = locale.value === 'en' ? 'en-US' : 'pt-BR'
+    const data = await apiGet(`${API_BASE_URL}/movie/${route.params.id}?append_to_response=credits,videos&language=${lang}`)
     movie.value = data
   } catch (e) {
     error.value = e.message || t('movieDetails.fetchError')
@@ -233,6 +235,10 @@ function getTrailerKey(videos) {
   return trailer ? trailer.key : null
 }
 
+function goToGenre(genreId) {
+  router.push({ path: `/genre/${genreId}`, query: { page: 1 } })
+}
+
 onMounted(() => {
   fetchMovie()
   // fetchUserLists será chamado pelo watch em authStore.isAuthenticated
@@ -250,6 +256,11 @@ watch(() => route.params.id, () => {
   watchedError.value = ''
   showListModal.value = false
   // Não precisa recarregar as listas do usuário aqui, elas não mudam com o filme
+})
+
+// Atualiza detalhes do filme ao mudar o idioma
+watch(locale, () => {
+  fetchMovie()
 })
 
 // Observa o estado de autenticação para buscar/limpar listas do usuário
@@ -321,5 +332,10 @@ watch(() => authStore.isAuthenticated, (newIsAuthenticated) => {
 /* Make the container position relative to contain backdrop */
 .container {
   z-index: 1;
+}
+
+.genre-badge:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 0 2px #0d6efd44;
 }
 </style>

@@ -1,46 +1,31 @@
 <template>
   <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3 g-md-4">
     <div v-for="movie in movies" :key="movie.id" class="col">
-      <div class="card h-100 bg-dark text-light border-secondary movie-card">
-        <div @click="goToMovie(movie.id)" class="clickable-area">
-          <div class="position-relative poster-container">
-            <img :src="getPosterUrl(movie.poster_path)" :alt="movie.title" class="card-img-top movie-poster" />
-            <div class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75 movie-rating" v-if="movie.vote_average">
-              <span>{{ movie.vote_average.toFixed(1) }}</span>
-              <span class="text-warning ms-1">★</span>
+      <div class="h-100 d-flex flex-column">
+        <MovieCard :movie="movie" class="flex-grow-1" />
+        <template v-if="showWatchedActions && movie.watched_at">
+          <div class="card-footer p-2 bg-secondary bg-opacity-25">
+            <div class="d-flex justify-content-around">
+              <button @click.stop="emitUpdateDate(movie.id)" class="btn btn-sm btn-outline-info p-1 flex-grow-1 me-1" :title="$t('movieList.actions.updateDateTitle')">
+                <i class="bi bi-calendar-event"></i> {{ $t('movieList.actions.edit') }}
+              </button>
+              <button @click.stop="emitDelete(movie.id)" class="btn btn-sm btn-outline-danger p-1 flex-grow-1 ms-1" :title="$t('movieList.actions.removeFromWatchedTitle')">
+                <i class="bi bi-trash"></i> {{ $t('movieList.actions.delete') }}
+              </button>
             </div>
-            <div class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75" v-if="movie.release_date">
-              {{ movie.release_date.substring(0, 4) }}
+            <div v-if="movieToUpdateDate === movie.id" class="mt-2">
+              <input type="date" v-model="newWatchedDate" class="form-control form-control-sm bg-dark text-light border-secondary" />
+              <button @click.stop="confirmUpdateDate(movie.id)" class="btn btn-sm btn-success w-100 mt-1">{{ $t('movieList.actions.confirmDate') }}</button>
             </div>
           </div>
-          <div class="card-body p-2 d-flex align-items-center justify-content-center">
-            <h6 class="card-title text-center mb-0">{{ movie.title }}</h6>
-          </div>
-        </div>
-
-        <!-- Watched Actions -->
-        <div v-if="showWatchedActions && movie.watched_at" class="card-footer p-2 bg-secondary bg-opacity-25">
-          <p class="text-light small mb-1 text-center">{{ $t('movieList.watchedOn') }} {{ formatDate(movie.watched_at) }}</p>
-          <div class="d-flex justify-content-around">
-            <button @click.stop="emitUpdateDate(movie.id)" class="btn btn-sm btn-outline-info p-1 flex-grow-1 me-1" :title="$t('movieList.actions.updateDateTitle')">
-              <i class="bi bi-calendar-event"></i> {{ $t('movieList.actions.edit') }}
-            </button>
-            <button @click.stop="emitDelete(movie.id)" class="btn btn-sm btn-outline-danger p-1 flex-grow-1 ms-1" :title="$t('movieList.actions.removeFromWatchedTitle')">
-              <i class="bi bi-trash"></i> {{ $t('movieList.actions.delete') }}
+        </template>
+        <template v-if="showRemoveFromList">
+          <div class="card-footer p-2 bg-secondary bg-opacity-10">
+            <button @click.stop="emitRemoveFromList(movie.id)" class="btn btn-sm btn-outline-warning w-100">
+              <i class="bi bi-x-circle"></i> {{ $t('movieList.actions.delete') }}
             </button>
           </div>
-          <!-- Input para nova data (inicialmente escondido) -->
-          <div v-if="movieToUpdateDate === movie.id" class="mt-2">
-            <input type="date" v-model="newWatchedDate" class="form-control form-control-sm bg-dark text-light border-secondary" />
-            <button @click.stop="confirmUpdateDate(movie.id)" class="btn btn-sm btn-success w-100 mt-1">{{ $t('movieList.actions.confirmDate') }}</button>
-          </div> 
-        </div>
-        <!-- Remove from List Button -->
-        <div v-if="showRemoveFromList" class="card-footer p-2 bg-secondary bg-opacity-10">
-          <button @click.stop="emitRemoveFromList(movie.id)" class="btn btn-sm btn-outline-warning w-100">
-            <i class="bi bi-x-circle"></i> {{ $t('movieList.actions.delete') }} <!-- Assuming same delete text is fine -->
-          </button>
-        </div>
+        </template>
       </div>
     </div>
   </div>
@@ -48,10 +33,12 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n' // Import useI18n
+import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { apiGet } from '@/utils/api'
+import MovieCard from './MovieCard.vue'
 
-const { t } = useI18n() // Initialize t
+const { t, locale } = useI18n() // Initialize t
 
 const props = defineProps({
   movies: {
@@ -133,56 +120,42 @@ function emitRemoveFromList(tmdbId) {
   emit('remove-from-list', tmdbId);
 }
 
+// Se MovieList for responsável por buscar os filmes, adicione lógica semelhante ao MovieDetails
+// Caso contrário, o componente pai deve garantir que os filmes estejam no idioma correto
+
+// Exemplo de recarregar filmes ao trocar idioma (caso MovieList busque os filmes):
+// watch(locale, () => { fetchMoviesNoComponentePai() })
+
+// Se MovieList só exibe, não busca, não precisa alterar nada além do alt/title
 </script>
 
 <style scoped>
 .movie-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex; /* Ensure footer is part of the card flow */
-  flex-direction: column; /* Stack card elements vertically */
-}
-
-.clickable-area {
-  cursor: pointer;
-  flex-grow: 1; /* Allow this area to take available space */
   display: flex;
   flex-direction: column;
-}
-
-.movie-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 0.5rem 1rem rgba(var(--bs-primary-rgb), 0.3) !important;
-}
-
-.poster-container {
-  aspect-ratio: 2/3;
-  overflow: hidden;
-}
-
-.movie-poster {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.movie-card:hover .movie-poster {
-  transform: scale(1.04);
-}
-
-.card-body {
-  min-height: 3.5rem; /* Ensure consistent card body height */
-  flex-grow: 0; /* Prevent card body from growing excessively */
+  min-height: 100%;
 }
 
 .card-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.125); /* Subtle separator */
+  border-top: 1px solid rgba(255, 255, 255, 0.125);
+  background-clip: padding-box;
+  z-index: 2;
 }
 
-.btn-sm i {
-  margin-right: 0.25rem;
+.col {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* Ensure Bootstrap icons are available if not globally included */
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css");
+.h-100 {
+  height: 100% !important;
+}
+
+.flex-grow-1 {
+  flex-grow: 1 !important;
+}
+
+/* Remove absolute positioning from footers */
 </style>

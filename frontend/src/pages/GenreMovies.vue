@@ -45,7 +45,7 @@ import { useI18n } from 'vue-i18n'; // Import useI18n
 import { apiGet } from '@/utils/api';
 import PaginationControls from '@/components/PaginationControls.vue';
 
-const { t } = useI18n(); // Initialize t function
+const { t, locale } = useI18n(); // Initialize t and locale
 
 const API_BASE_URL = '/api/tmdb'
 const route = useRoute()
@@ -64,7 +64,8 @@ const fetchMoviesByGenre = async () => {
   try {
     const genreId = route.params.id
     genreName.value = route.query.name || ''
-    const data = await apiGet(`${API_BASE_URL}/discover/movie?with_genres=${genreId}&page=${page.value}`)
+    const lang = locale.value === 'en' ? 'en-US' : 'pt-BR'
+    const data = await apiGet(`${API_BASE_URL}/discover/movie?with_genres=${genreId}&page=${page.value}&language=${lang}`)
     if (!data || !Array.isArray(data.results)) {
       throw new Error('Resposta inesperada da API de filmes.')
     }
@@ -97,6 +98,10 @@ function handlePageChange(newPage) { // Renamed from changePage
 watch(() => route.params.id, () => {
   page.value = 1
   totalPages.value = 0; // Reset totalPages on genre change
+  fetchMoviesByGenre()
+})
+
+watch(locale, () => {
   fetchMoviesByGenre()
 })
 

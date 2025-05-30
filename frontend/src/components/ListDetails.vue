@@ -43,7 +43,7 @@ import MovieList from './MovieList.vue'
 import { useAuthStore } from '@/stores/auth'
 import { apiGet, apiDelete } from '@/utils/api'
 
-const { t } = useI18n() // Initialize t
+const { t, locale } = useI18n() // Initialize t and locale
 const route = useRoute()
 const authStore = useAuthStore()
 
@@ -71,9 +71,9 @@ async function fetchListDetails() {
     list.value = data
 
     if (data.movies && data.movies.length > 0) {
+      const lang = locale.value === 'en' ? 'en-US' : 'pt-BR'
       const promises = data.movies.map(async (movieItem) => {
         let idForApiCall;
-
         if (typeof movieItem === 'object' && movieItem !== null) {
           if (movieItem.tmdb_id !== undefined && typeof movieItem.tmdb_id !== 'object') {
             idForApiCall = movieItem.tmdb_id;
@@ -83,14 +83,12 @@ async function fetchListDetails() {
         } else if (typeof movieItem === 'string' || typeof movieItem === 'number') {
           idForApiCall = movieItem;
         }
-
         if (idForApiCall === undefined || idForApiCall === null || String(idForApiCall).trim() === '' || typeof idForApiCall === 'object') {
           console.error(t('listDetails.error.invalidTmdbIdConsole'), movieItem, 'ID extraído:', idForApiCall);
           return null;
         }
-
         try {
-          const movieDetails = await apiGet(`${API_BASE_URL}/movie/${idForApiCall}`);
+          const movieDetails = await apiGet(`${API_BASE_URL}/movie/${idForApiCall}?language=${lang}`)
           return movieDetails;
         } catch (e) {
           console.error(t('listDetails.error.fetchTmdbMovieConsole', { id: idForApiCall, message: e.message }), 'Item original:', movieItem);
@@ -121,6 +119,10 @@ watch(() => authStore.isAuthenticated, (newIsAuthenticated) => {
     fetchListDetails()
   }
 }, { immediate: true })
+
+watch(locale, () => {
+  fetchListDetails()
+})
 
 async function handleRemoveFromList(tmdbId) {
   if (!authStore.isAuthenticated || !list.value.id) return;

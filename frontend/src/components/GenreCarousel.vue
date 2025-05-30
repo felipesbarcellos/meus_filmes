@@ -42,7 +42,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { apiGet } from '@/utils/api'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const props = defineProps({
   type: {
@@ -83,7 +83,8 @@ const fetchGenres = async () => {
   error.value = ''
   try {
     const endpoint = props.type === 'tv' ? 'tv/genres' : 'movie/genres'
-    const data = await apiGet(`${API_BASE_URL}/${endpoint}`)
+    const lang = locale.value === 'en' ? 'en-US' : 'pt-BR'
+    const data = await apiGet(`${API_BASE_URL}/${endpoint}?language=${lang}`)
     if (!data || !Array.isArray(data.genres)) {
       throw new Error(t('genreCarousel.error.apiResponse'))
     }
@@ -118,6 +119,10 @@ function goToGenre(genre) {
 }
 
 watch(() => props.type, fetchGenres)
+watch(locale, () => {
+  fetchGenres()
+  currentIndex.value = 0
+})
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)
