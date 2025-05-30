@@ -24,13 +24,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import MovieList from '@/components/MovieList.vue'
 import { apiGet } from '@/utils/api'
 import { useI18n } from 'vue-i18n' // Import useI18n
 
-const { t } = useI18n() // Initialize t function
+const { t, locale } = useI18n() // Initialize t and locale
 
 const route = useRoute()
 const list = ref({ id: null, name: '', is_main: false, user_id: null, movies: [] })
@@ -47,11 +47,12 @@ async function fetchPublicListDetails() {
     const data = await apiGet(`${BACKEND_API_URL}/lists/public/${route.params.id}`)
     list.value = data
     if (data.movies && data.movies.length > 0) {
+      const lang = locale.value === 'en' ? 'en-US' : 'pt-BR'
       const promises = data.movies.map(async (movieItem) => {
         let idForApiCall = typeof movieItem === 'object' && movieItem !== null ? movieItem.tmdb_id : movieItem
         if (!idForApiCall) return null
         try {
-          const movieDetails = await apiGet(`${API_BASE_URL}/movie/${idForApiCall}`)
+          const movieDetails = await apiGet(`${API_BASE_URL}/movie/${idForApiCall}?language=${lang}`)
           return movieDetails
         } catch (e) {
           // Log individual movie fetch error, but don't necessarily fail the whole page
@@ -73,6 +74,10 @@ async function fetchPublicListDetails() {
 }
 
 onMounted(fetchPublicListDetails)
+
+watch(locale, () => {
+  fetchPublicListDetails()
+})
 </script>
 
 <style scoped>
