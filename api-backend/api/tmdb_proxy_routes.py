@@ -31,11 +31,33 @@ def get_popular_movies():
     page = request.args.get("page", 1)
     language = request.args.get("language", "pt-BR")
     try:
-        response = requests.get(
-            f"{TMDB_BASE_URL}/movie/popular?api_key={TMDB_API_KEY}&language={language}&page={page}"
-        )
+        url = f"{TMDB_BASE_URL}/discover/movie"
+        params = {
+            "api_key": TMDB_API_KEY,
+            "language": language,
+            "sort_by": "popularity.desc",
+            "page": page,
+            "include_adult": False,  # Boolean instead of string
+            "certification_country": "BR",
+            "certification.lte": "18"  # Filmes até 14 anos (sem conteúdo adulto)
+        }
+        response = requests.get(url, params=params)
         response.raise_for_status()
         data = response.json()
+        
+        # Filtragem manual adicional como backup
+        if "results" in data:
+            filtered_results = []
+            for movie in data["results"]:
+                # Filtrar filmes que podem ser adultos baseado em gêneros e ratings
+                if movie.get("adult", False) == False:
+                    # Verificar se não tem gêneros adultos (geralmente não há gênero específico, mas podemos verificar rating)
+                    if movie.get("vote_average", 0) > 0:  # Filmes com rating válido
+                        filtered_results.append(movie)
+            
+            data["results"] = filtered_results
+            data["total_results"] = len(filtered_results)
+        
         return jsonify(data)
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
@@ -104,18 +126,27 @@ def search_movies():
     if not query:
         return jsonify({"error": "Search query is required"}), 400
     try:
-        response = requests.get(
-            f"{TMDB_BASE_URL}/search/movie?api_key={TMDB_API_KEY}&language={language}&query={query}&page={page}"
-        )
+        params = {
+            "api_key": TMDB_API_KEY,
+            "language": language,
+            "query": query,
+            "page": page,
+            "include_adult": False
+        }
+        response = requests.get(f"{TMDB_BASE_URL}/search/movie", params=params)
         response.raise_for_status()
         data = response.json()
-
-        # Removed call to _save_movie_details_if_not_exist
-        # if data and "results" in data:
-        #     for movie_summary in data["results"]:
-        #         if movie_summary and movie_summary.get("id"):
-        #             _save_movie_details_if_not_exist(movie_summary.get("id"))
-
+        
+        # Filtragem manual adicional como backup
+        if "results" in data:
+            filtered_results = []
+            for movie in data["results"]:
+                if movie.get("adult", False) == False:
+                    filtered_results.append(movie)
+            
+            data["results"] = filtered_results
+            data["total_results"] = len(filtered_results)
+        
         return jsonify(data)
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
@@ -142,16 +173,28 @@ def get_movie_recommendations(tmdb_id):
     page = request.args.get("page", 1)
     language = request.args.get("language", "pt-BR")
     try:
+        params = {
+            "api_key": TMDB_API_KEY,
+            "language": language,
+            "page": page,
+            "include_adult": False
+        }
         response = requests.get(
-            f"{TMDB_BASE_URL}/movie/{tmdb_id}/recommendations?api_key={TMDB_API_KEY}&language={language}&page={page}"
+            f"{TMDB_BASE_URL}/movie/{tmdb_id}/recommendations", params=params
         )
         response.raise_for_status()
         data = response.json()
-        # Removed call to _save_movie_details_if_not_exist
-        # if data and "results" in data:
-        #     for movie_summary in data["results"]:
-        #         if movie_summary and movie_summary.get("id"):
-        #             _save_movie_details_if_not_exist(movie_summary.get("id"))
+        
+        # Filtragem manual adicional como backup
+        if "results" in data:
+            filtered_results = []
+            for movie in data["results"]:
+                if movie.get("adult", False) == False:
+                    filtered_results.append(movie)
+            
+            data["results"] = filtered_results
+            data["total_results"] = len(filtered_results)
+        
         return jsonify(data)
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
@@ -203,17 +246,26 @@ def discover_movies():
         return jsonify({"error": "Genre ID (with_genres) is required"}), 400
     
     try:
-        response = requests.get(
-            f"{TMDB_BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&language={language}&with_genres={genre_id}&page={page}"
-        )
+        params = {
+            "api_key": TMDB_API_KEY,
+            "language": language,
+            "with_genres": genre_id,
+            "page": page,
+            "include_adult": False
+        }
+        response = requests.get(f"{TMDB_BASE_URL}/discover/movie", params=params)
         response.raise_for_status()
         data = response.json()
         
-        # Removed call to _save_movie_details_if_not_exist
-        # if data and "results" in data:
-        #     for movie_summary in data["results"]:
-        #         if movie_summary and movie_summary.get("id"):
-        #             _save_movie_details_if_not_exist(movie_summary.get("id"))
+        # Filtragem manual adicional como backup
+        if "results" in data:
+            filtered_results = []
+            for movie in data["results"]:
+                if movie.get("adult", False) == False:
+                    filtered_results.append(movie)
+            
+            data["results"] = filtered_results
+            data["total_results"] = len(filtered_results)
         
         return jsonify(data)
     except requests.exceptions.RequestException as e:
