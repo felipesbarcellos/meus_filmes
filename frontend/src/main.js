@@ -89,7 +89,7 @@ router.beforeEach((to, from, next) => {
 // Configure i18n
 const i18n = createI18n({
   legacy: false, // Use Composition API mode
-  locale: navigator.language.split('-')[0] || 'pt', // Default locale
+  locale: 'pt', // Default locale: Português Brasileiro
   fallbackLocale: 'en', // Fallback locale
   messages: {
     en: enMessages,

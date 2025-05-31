@@ -69,9 +69,10 @@ onUnmounted(() => {
   }
 });
 
-function toggleLanguage() {
-  locale.value = locale.value === 'en' ? 'pt' : 'en'
-}
+// Função de mudança de idioma comentada - idioma fixo em Português BR
+// function toggleLanguage() {
+//   locale.value = locale.value === 'en' ? 'pt' : 'en'
+// }
 </script>
 
 <template>
@@ -103,12 +104,14 @@ function toggleLanguage() {
               </template>
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+              <!-- Botão de mudança de idioma comentado - idioma padrão: Português BR
               <li class="nav-item">
                 <button class="btn btn-outline-light d-flex align-items-center gap-1" @click="toggleLanguage" style="font-weight: bold;">
                   <i class="bi bi-globe2"></i>
                   <span style="font-size: 1rem; letter-spacing: 1px;">{{ locale.toUpperCase().slice(0,2) }}</span>
                 </button>
               </li>
+              -->
               <template v-if="authStore.isAuthenticated">
                 <li class="nav-item">
                   <span class="nav-link text-warning">{{ authStore.userName }}</span>
