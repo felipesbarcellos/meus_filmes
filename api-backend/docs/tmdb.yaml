@@ -1,0 +1,279 @@
+config:
+  get:
+    summary: Obtém a configuração do TMDB (chave de API, base de imagens, etc)
+    tags:
+      - TMDB
+    responses:
+      '200':
+        description: Configuração do TMDB retornada com sucesso
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Configuração do TMDB
+      '500':
+        description: Erro ao buscar configuração do TMDB
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+popular:
+  get:
+    summary: Lista filmes populares do TMDB
+    tags:
+      - TMDB
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        required: false
+        description: Página dos resultados
+    responses:
+      '200':
+        description: Lista de filmes populares
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Lista paginada de filmes populares
+      '500':
+        description: Erro ao buscar filmes populares
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+movie_details:
+  get:
+    summary: Detalhes de um filme pelo TMDB ID (usa cache local se disponível)
+    tags:
+      - TMDB
+    parameters:
+      - in: path
+        name: tmdb_id
+        schema:
+          type: integer
+        required: true
+        description: ID do filme no TMDB
+    responses:
+      '200':
+        description: Detalhes do filme
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Detalhes completos do filme
+      '404':
+        description: Filme não encontrado
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+      '500':
+        description: Erro inesperado
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+search:
+  get:
+    summary: Busca filmes no TMDB por texto
+    tags:
+      - TMDB
+    parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: Texto de busca
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        required: false
+        description: Página dos resultados
+    responses:
+      '200':
+        description: Resultados da busca
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Resultados paginados da busca
+      '400':
+        description: Parâmetro de busca ausente
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '500':
+        description: Erro ao buscar filmes
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+credits:
+  get:
+    summary: Créditos (elenco e equipe) de um filme
+    tags:
+      - TMDB
+    parameters:
+      - in: path
+        name: tmdb_id
+        schema:
+          type: integer
+        required: true
+        description: ID do filme no TMDB
+    responses:
+      '200':
+        description: Créditos do filme
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Elenco e equipe do filme
+      '404':
+        description: Filme não encontrado
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+      '500':
+        description: Erro ao buscar créditos
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+recommendations:
+  get:
+    summary: Recomendações de filmes similares
+    tags:
+      - TMDB
+    parameters:
+      - in: path
+        name: tmdb_id
+        schema:
+          type: integer
+        required: true
+        description: ID do filme no TMDB
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        required: false
+        description: Página dos resultados
+    responses:
+      '200':
+        description: Lista de recomendações
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Lista paginada de filmes recomendados
+      '404':
+        description: Filme não encontrado
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+      '500':
+        description: Erro ao buscar recomendações
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+genres_legacy:
+  get:
+    summary: Lista de gêneros de filmes (legado)
+    tags:
+      - TMDB
+    deprecated: true
+    responses:
+      '200':
+        description: Lista de gêneros
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Lista de gêneros de filmes
+      '500':
+        description: Erro ao buscar gêneros
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+genres:
+  get:
+    summary: Lista de gêneros de filmes (novo endpoint)
+    tags:
+      - TMDB
+    responses:
+      '200':
+        description: Lista de gêneros
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Lista de gêneros de filmes
+      '500':
+        description: Erro ao buscar gêneros
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+discover:
+  get:
+    summary: Descobre filmes por gênero
+    tags:
+      - TMDB
+    parameters:
+      - in: query
+        name: with_genres
+        schema:
+          type: string
+        required: true
+        description: IDs dos gêneros separados por vírgula
+        example: "28,12"
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        required: false
+        description: Página dos resultados
+    responses:
+      '200':
+        description: Lista de filmes descobertos
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Lista paginada de filmes filtrados por gênero
+      '400':
+        description: Parâmetro de gênero ausente
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '500':
+        description: Erro ao buscar filmes
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'

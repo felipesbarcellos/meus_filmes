@@ -1,0 +1,284 @@
+lists:
+  get:
+    summary: Lista todas as listas do usuário autenticado
+    tags:
+      - Lists
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Listas do usuário
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: './schemas.yaml#/components/schemas/ListResponse'
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+  post:
+    summary: Cria uma nova lista personalizada para o usuário autenticado
+    tags:
+      - Lists
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/CreateListRequest'
+    responses:
+      '201':
+        description: Lista criada
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/ListResponse'
+      '400':
+        description: Nome ausente
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+
+add_movie_to_list:
+  post:
+    summary: Adiciona um filme a uma lista do usuário
+    tags:
+      - Lists
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/AddMovieToListRequest'
+    responses:
+      '201':
+        description: Filme adicionado à lista
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/AddMovieToListResponse'
+      '400':
+        description: Dados ausentes
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+      '404':
+        description: Lista não encontrada
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+      '409':
+        description: Filme já está na lista
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/ConflictError'
+      '500':
+        description: Erro ao salvar filme
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+
+list_by_id:
+  get:
+    summary: Detalhes de uma lista do usuário
+    tags:
+      - Lists
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: list_id
+        schema:
+          type: integer
+        required: true
+        description: ID da lista
+    responses:
+      '200':
+        description: Detalhes da lista
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/ListWithMovies'
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+      '404':
+        description: Lista não encontrada
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+  delete:
+    summary: Exclui uma lista personalizada do usuário
+    tags:
+      - Lists
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: list_id
+        schema:
+          type: integer
+        required: true
+        description: ID da lista
+    responses:
+      '200':
+        description: Lista excluída
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+      '403':
+        description: Não é permitido excluir listas principais
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '404':
+        description: Lista não encontrada
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+  put:
+    summary: Renomeia uma lista do usuário
+    tags:
+      - Lists
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: list_id
+        schema:
+          type: integer
+        required: true
+        description: ID da lista
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/RenameListRequest'
+    responses:
+      '200':
+        description: Lista renomeada
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/ListResponse'
+      '400':
+        description: Nome ausente
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+      '403':
+        description: Não é permitido renomear listas principais
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '404':
+        description: Lista não encontrada
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+
+remove_movie_from_list:
+  delete:
+    summary: Remove um filme de uma lista do usuário
+    tags:
+      - Lists
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: list_id
+        schema:
+          type: integer
+        required: true
+        description: ID da lista
+      - in: path
+        name: tmdb_id
+        schema:
+          type: integer
+        required: true
+        description: ID do filme no TMDB
+    responses:
+      '200':
+        description: Filme removido da lista
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+      '404':
+        description: Lista ou filme não encontrado
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+
+public_list:
+  get:
+    summary: Get public details of a list by its ID (no authentication required)
+    tags:
+      - Lists
+    parameters:
+      - in: path
+        name: list_id
+        schema:
+          type: integer
+        required: true
+        description: List ID
+    responses:
+      '200':
+        description: Public list details
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/ListWithMovies'
+      '404':
+        description: List not found
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'

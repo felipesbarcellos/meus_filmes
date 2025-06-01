@@ -1,0 +1,19 @@
+health_check:
+  get:
+    summary: Health Check
+    description: Checks the health of the API and its database connection.
+    tags:
+      - General
+    responses:
+      '200':
+        description: API is healthy and database is connected.
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/HealthResponse'
+      '500':
+        description: API is unhealthy or database is disconnected.
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/HealthErrorResponse'

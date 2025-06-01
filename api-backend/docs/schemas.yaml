@@ -1,0 +1,257 @@
+components:
+  schemas:
+    # Authentication Schemas
+    UserRegistration:
+      type: object
+      properties:
+        name:
+          type: string
+          example: João da Silva
+        email:
+          type: string
+          format: email
+          example: joao@email.com
+        password:
+          type: string
+          format: password
+          example: senha123
+      required:
+        - name
+        - email
+        - password
+
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: joao@email.com
+        password:
+          type: string
+          format: password
+          example: senha123
+      required:
+        - email
+        - password
+
+    PasswordRecovery:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: joao@email.com
+      required:
+        - email
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+
+    # Watched Movie Schemas
+    WatchedMovieRequest:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+          example: 603692
+        watched_at:
+          type: string
+          format: date
+          example: '2024-05-20'
+      required:
+        - tmdb_id
+        - watched_at
+
+    WatchedMovieResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        tmdb_id:
+          type: integer
+        watched_at:
+          type: string
+        msg:
+          type: string
+
+    WatchedMoviesList:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        watched:
+          type: array
+          items:
+            type: object
+            properties:
+              tmdb_id:
+                type: integer
+              watched_at:
+                type: string
+
+    WatchedMoviesCount:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        count:
+          type: integer
+
+    # List Schemas
+    CreateListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+
+    ListResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        is_main:
+          type: boolean
+        user_id:
+          type: integer
+
+    ListWithMovies:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        is_main:
+          type: boolean
+        user_id:
+          type: integer
+        movies:
+          type: array
+          items:
+            type: object
+            properties:
+              tmdb_id:
+                type: integer
+
+    AddMovieToListRequest:
+      type: object
+      properties:
+        list_id:
+          type: integer
+        tmdb_id:
+          type: integer
+      required:
+        - list_id
+        - tmdb_id
+
+    AddMovieToListResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+        tmdb_id:
+          type: integer
+
+    RenameListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+
+    # Health Check Schema
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+        database:
+          type: string
+          example: connected
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: '1.0.0'
+
+    HealthErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: unhealthy
+        database:
+          type: string
+          example: disconnected
+        error:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    # Generic Error Responses
+    BadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    UnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Unauthorized
+        message:
+          type: string
+
+    NotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Not Found
+        message:
+          type: string
+
+    ConflictError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Conflict
+        message:
+          type: string
+
+    InternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Internal Server Error
+        message:
+          type: string

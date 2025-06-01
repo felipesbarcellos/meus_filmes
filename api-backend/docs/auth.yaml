@@ -1,0 +1,88 @@
+register:
+  post:
+    summary: Registra um novo usuário
+    tags:
+      - Authentication
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/UserRegistration'
+    responses:
+      '201':
+        description: Usuário registrado com sucesso
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/AuthResponse'
+      '400':
+        description: Campos obrigatórios ausentes
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '409':
+        description: Email já registrado
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/ConflictError'
+
+login:
+  post:
+    summary: Login do usuário
+    tags:
+      - Authentication
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/UserLogin'
+    responses:
+      '200':
+        description: Login realizado com sucesso
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/AuthResponse'
+      '400':
+        description: Campos obrigatórios ausentes
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '401':
+        description: Credenciais inválidas
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+
+recovery:
+  post:
+    summary: Solicita recuperação de senha
+    tags:
+      - Authentication
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/PasswordRecovery'
+    responses:
+      '200':
+        description: Instruções de recuperação enviadas (ou resposta genérica)
+      '400':
+        description: Email ausente
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '404':
+        description: Email não encontrado
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'

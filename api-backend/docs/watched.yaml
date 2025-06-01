@@ -1,0 +1,135 @@
+watched_movies:
+  post:
+    summary: Marca um filme como assistido para o usuário autenticado
+    tags:
+      - Watched
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/components/schemas/WatchedMovieRequest'
+    responses:
+      '201':
+        description: Filme marcado como assistido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/WatchedMovieResponse'
+      '200':
+        description: Data de assistido atualizada
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/WatchedMovieResponse'
+      '400':
+        description: Dados ausentes ou inválidos
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+      '500':
+        description: Erro ao salvar filme assistido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/InternalServerError'
+  get:
+    summary: Lista todos os filmes assistidos do usuário autenticado
+    tags:
+      - Watched
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Lista de filmes assistidos
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/WatchedMoviesList'
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+
+watched_movie_by_id:
+  delete:
+    summary: Remove um filme da lista de assistidos do usuário autenticado
+    tags:
+      - Watched
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: tmdb_id
+        schema:
+          type: integer
+        required: true
+        description: ID do filme no TMDB
+    responses:
+      '200':
+        description: Filme removido da lista de assistidos
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
+      '404':
+        description: Filme não encontrado na lista de assistidos
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/NotFoundError'
+
+watched_count:
+  get:
+    summary: Conta o número de filmes assistidos pelo usuário autenticado, com filtro opcional por data
+    tags:
+      - Watched
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        required: false
+        description: Data inicial (YYYY-MM-DD)
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        required: false
+        description: Data final (YYYY-MM-DD)
+    responses:
+      '200':
+        description: Contagem de filmes assistidos
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/WatchedMoviesCount'
+      '400':
+        description: Formato de data inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/BadRequestError'
+      '401':
+        description: Token de autenticação inválido
+        content:
+          application/json:
+            schema:
+              $ref: './schemas.yaml#/components/schemas/UnauthorizedError'
