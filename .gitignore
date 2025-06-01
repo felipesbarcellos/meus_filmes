@@ -61,3 +61,5 @@ yarn-error.log*
 *.txt
 docker-compose.dev.yml
 nginx.dev.conf
+
+run_ec2_meus_filmes.sh
