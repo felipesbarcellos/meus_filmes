@@ -1,6 +1,5 @@
 import os
 from flask import Flask, jsonify, abort
-from flask_mail import Mail
 from flask_swagger_ui import get_swaggerui_blueprint
 import yaml
 
@@ -11,7 +10,11 @@ def create_app(config_name=None):
     app = Flask(__name__)
 
     # Configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://root:root@localhost/meus_filmes')
+    # Use SQLite for development if DATABASE_URL is not set or MySQL connection fails
+    default_db_url = os.environ.get('DATABASE_URL')
+    if not default_db_url:
+        default_db_url = 'sqlite:///instance/meus_filmes.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = default_db_url
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
     app.config['TMDB_API_KEY'] = os.environ.get("TMDB_API_KEY")
     app.config['TMDB_BASE_URL'] = os.environ.get("TMDB_BASE_URL", "https://api.themoviedb.org/3")
@@ -59,17 +62,30 @@ def create_app(config_name=None):
 
     # Create database tables if they don't exist
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+            print("Database tables created successfully")
+        except Exception as e:
+            print(f"Warning: Could not create database tables: {e}")
+            print("Continuing without database initialization...")
 
     # Serve openapi.yaml content as JSON from a dedicated route
     @app.route(API_SPEC_ROUTE)
     def serve_openapi_spec():
         try:
-            # app.root_path is the path to the directory where app.py is located (api-backend)
-            spec_path = os.path.join(app.root_path, 'openapi.yaml')
-            with open(spec_path, 'r', encoding='utf-8') as f:
-                content = yaml.safe_load(f) # Parse YAML
-            return jsonify(content) # Serve as JSON
+            # Try to use prance to resolve $ref references
+            try:
+                from prance import ResolvingParser
+                spec_path = os.path.join(app.root_path, 'openapi.yaml')
+                parser = ResolvingParser(spec_path)
+                return jsonify(parser.specification)
+            except ImportError:
+                # Fallback to simple YAML loading if prance is not available
+                app.logger.warning("prance not available, serving OpenAPI spec without $ref resolution")
+                spec_path = os.path.join(app.root_path, 'openapi.yaml')
+                with open(spec_path, 'r', encoding='utf-8') as f:
+                    content = yaml.safe_load(f)
+                return jsonify(content)
         except FileNotFoundError:
             app.logger.error(f"OpenAPI specification file not found at {spec_path}")
             abort(404, description="OpenAPI specification file not found.")
