@@ -4,7 +4,7 @@ This project was created to keep track of movies watched and view related statis
 
 ## Online Demo
 
-You can test the application at: [http://meusfilmes.shop/](http://meusfilmes.shop/)
+You can test the application at: [http://meusfilmes.shop/](http://meusfilmes.shop/) (deployed on aws)
 
 ## Prerequisites
 
