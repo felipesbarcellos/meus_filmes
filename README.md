@@ -4,7 +4,8 @@ This project was created to keep track of movies watched and view related statis
 
 ## Online Demo
 
-You can test the application at: [http://meusfilmes.shop/](http://meusfilmes.shop/) (deployed on aws)
+~~You can test the application at: [http://meusfilmes.shop/](http://meusfilmes.shop/)~~
+The application is currently offline due to AWS hosting limits.
 
 ## Prerequisites
 
@@ -73,3 +74,4 @@ Below are some screenshots of the application in use:
 | ![Mark as Watched](screenshots/mark_as_watched.png) | ![Watched List](screenshots/watched_list.png) |
 
 > All screenshots are located in the `screenshots/` directory.
+
