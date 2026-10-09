@@ -39,6 +39,45 @@ Before you begin, ensure you have the following installed:
 
 After the containers are up and running, you should be able to access the application as per its configuration (e.g., via a web browser at `http://localhost`).
 
+## Database Backup
+
+The `db-backup` service runs automatically alongside the stack and creates a
+gzipped `mysqldump` of `${MYSQL_DATABASE}` into the `./backups` directory on the
+host.
+
+- Default schedule: **once every 24 hours** (`BACKUP_INTERVAL_SECONDS=86400`).
+- Backups older than **7 days** are pruned automatically (`BACKUP_RETENTION_DAYS=7`).
+- Both values can be overridden in the `.env` file (see `.env.example`).
+- The scheduler runs in the container and restarts automatically
+  (`restart: unless-stopped`), surviving host reboots as long as the Docker
+  daemon starts on boot.
+
+### Manual backup (on demand)
+
+To create a backup immediately without waiting for the next cycle:
+
+```bash
+./run_backup.sh
+```
+
+This uses the `backup` service (profile `tools`) and uses the same script.
+
+### Restore
+
+```bash
+gunzip -c backups/<arquivo>.sql.gz | docker compose exec -T db mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"
+```
+
+> Backups are stored only on the local host disk. There is no offsite copy, so a
+> disk failure would lose both the database and its backups.
+
+### Future improvements
+
+- `scripts/restore.sh`: an interactive helper to list available backups and
+  restore a selected one, including a confirmation prompt and pre-restore
+  safety backup.
+- Offsite replication (e.g. S3/rclone) of the generated `.sql.gz` files.
+
 ## Status & Roadmap
 
 - Password recovery functionality is still pending implementation.

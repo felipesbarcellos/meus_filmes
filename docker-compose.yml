@@ -92,19 +92,43 @@ services:
       - .env
     environment:
       - MYSQL_PWD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-7}
     volumes:
       - ./backups:/backups
-    command: >
-      bash -c '
-        mkdir -p /backups &&
-        echo "Criando backup em $(date +%Y-%m-%d_%H-%M-%S)" &&
-        mysqldump -h db -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} --no-tablespaces > /backups/backup_$(date +%Y%m%d_%H%M%S).sql &&
-        echo "Backup concluído com sucesso!"
-      '
+      - ./scripts/backup.sh:/usr/local/bin/backup.sh:ro
+    entrypoint: ["bash", "/usr/local/bin/backup.sh"]
     depends_on:
-      - db
-    restart: "no"  # Não reiniciar automaticamente
-    profiles: ["tools"]  # Não inicia com docker-compose up (use docker-compose --profile tools up backup)
+      db:
+        condition: service_healthy
+    restart: "no"  # Execução única, não reiniciar automaticamente
+    profiles: ["tools"]  # Não inicia com docker-compose up (use ./run_backup.sh)
+
+  db-backup:
+    image: mysql:8.0.32
+    env_file:
+      - .env
+    environment:
+      - MYSQL_PWD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - BACKUP_INTERVAL_SECONDS=${BACKUP_INTERVAL_SECONDS:-86400}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-7}
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/usr/local/bin/backup.sh:ro
+    entrypoint: ["bash", "/usr/local/bin/backup.sh"]
+    command: ["--loop"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped  # Mantém o agendador ativo e reinicia em caso de falha/reboot
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
 
 volumes:
   db_data:
